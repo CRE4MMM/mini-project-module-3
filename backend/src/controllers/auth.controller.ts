@@ -41,7 +41,6 @@ class AuthController {
             }
 
             const hashedPassword = await hashPassword(password);
-
             const referralCode = generateReferral()
 
             const newUser = await prisma.user.create({

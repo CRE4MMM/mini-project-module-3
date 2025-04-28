@@ -1,103 +1,213 @@
-import Image from "next/image";
+'use client'
+import { useState, useEffect } from 'react'
+import Head from 'next/head'
+import { debounce } from 'lodash'
+import Footer from '../components/core/Footer'
+import EventCard from '../components/ui/EventCard'
+import SearchBar from '../components/ui/SearchBar'
+import CategoryFilter from '../components/ui/CategoryFilter'
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+export interface EventItem {
+  id: number
+  name: string
+  description: string
+  price: number
+  startDate: string
+  endDate: string
+  location: string
+  category: string
+  availableSeats: number
 }
+
+const MOCK_EVENTS: EventItem[] = [
+  {
+    id: 1,
+    name: 'Tech Conference 2025',
+    description: 'Annual tech conference featuring the latest innovations',
+    price: 300000,
+    startDate: '2025-05-15T09:00:00',
+    endDate: '2025-05-17T18:00:00',
+    location: 'Jakarta Convention Center',
+    category: 'Technology',
+    availableSeats: 500,
+  },
+  {
+    id: 2,
+    name: 'Music Festival',
+    description: 'A weekend of amazing music performances',
+    price: 450000,
+    startDate: '2025-06-10T14:00:00',
+    endDate: '2025-06-12T23:00:00',
+    location: 'Bali Beach Resort',
+    category: 'Music',
+    availableSeats: 2000,
+  },
+  {
+    id: 3,
+    name: 'Food & Culinary Expo',
+    description: 'Explore culinary delights from around the world',
+    price: 150000,
+    startDate: '2025-04-20T10:00:00',
+    endDate: '2025-04-22T20:00:00',
+    location: 'Bandung Exhibition Center',
+    category: 'Food',
+    availableSeats: 1200,
+  },
+  {
+    id: 4,
+    name: 'Business Leadership Summit',
+    description: 'Learn from top business leaders',
+    price: 750000,
+    startDate: '2025-07-05T08:00:00',
+    endDate: '2025-07-06T17:00:00',
+    location: 'Grand Hyatt Jakarta',
+    category: 'Business',
+    availableSeats: 300,
+  },
+  {
+    id: 5,
+    name: 'Charity Run',
+    description: 'Run for a cause and help raise funds',
+    price: 0,
+    startDate: '2025-05-30T06:00:00',
+    endDate: '2025-05-30T11:00:00',
+    location: 'Senayan City Park',
+    category: 'Sports',
+    availableSeats: 5000,
+  },
+  {
+    id: 6,
+    name: 'Summer Tech Expo',
+    description: 'Explore the latest in tech innovation and gadgets',
+    price: 250000,
+    startDate: '2025-06-15T09:00:00',
+    endDate: '2025-06-15T18:00:00',
+    location: 'Downtown Convention Center',
+    category: 'Technology',
+    availableSeats: 1200,
+  },
+]
+
+const categories: string[] = [
+  'All',
+  'Technology',
+  'Music',
+  'Food',
+  'Business',
+  'Sports',
+]
+const locations: string[] = [
+  'All', 
+  'Jakarta', 
+  'Bali', 
+  'Bandung'
+]
+
+const Home: React.FC = () => {
+  const [events, setEvents] = useState<EventItem[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<EventItem[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [selectedLocation, setSelectedLocation] = useState<string>('All')
+
+  useEffect(() => {
+    setEvents(MOCK_EVENTS)
+    setFilteredEvents(MOCK_EVENTS)
+  }, [])
+
+  useEffect(() => {
+    const filtered = events.filter((evt) => {
+      const matchesSearch =
+        evt.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        evt.description.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesCategory =
+        selectedCategory === 'All' || evt.category === selectedCategory
+
+      const matchesLocation =
+        selectedLocation === 'All' || evt.location.includes(selectedLocation)
+
+      return matchesSearch && matchesCategory && matchesLocation
+    })
+
+    setFilteredEvents(filtered)
+  }, [searchTerm, selectedCategory, selectedLocation, events])
+
+  const handleSearch = debounce((value: string) => {
+    setSearchTerm(value)
+  }, 1000)
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Head>
+        <title>EventHub - Discover Amazing Events</title>
+        <meta
+          name="description"
+          content="Find and book the best events in your area"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main className="container mx-auto px-4 py-8">
+        <section className="mb-12 text-center">
+          <h1 className="text-4xl text-black font-bold mb-4">
+            Discover Amazing Events
+          </h1>
+          <p className="text-lg text-black mb-8">
+            Find and book tickets for the best events around you
+          </p>
+
+          <div className="max-w-3xl mx-auto">
+            <SearchBar onSearch={handleSearch} />
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <div className="flex flex-wrap gap-4 mb-8">
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+
+            <div className="ml-auto">
+              <select
+                className="bg-blue-600 text-white border border-blue-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 hover:bg-blue-700 transition duration-200 appearance-none cursor-pointer"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+              >
+                {locations.map((location) => (
+                  <option
+                    key={location}
+                    value={location}
+                    className="bg-blue-800 text-white"
+                  >
+                    {location}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((evt) => (
+                <EventCard key={evt.id} event={evt} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-xl text-gray-500">
+                  No events found matching your criteria
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+export default Home
