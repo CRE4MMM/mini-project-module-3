@@ -12,7 +12,7 @@
             "src": "/(.*)",
             "dest": "dist/index.js",
             "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-            "header": {
+            "Headers": {
                 "Access-Control-ALlow-Credentials" : "true",
                 "Access-Control-ALlow-Origin" : "*",
                 "Access-Control-ALlow-methods" : "GET, OPTIONS, PATCH, POST, PUT, DELETE",
