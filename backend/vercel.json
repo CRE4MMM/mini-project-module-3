@@ -1,0 +1,23 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "dist/index.js",
+            "use": "@vercel/node",
+            "config": {"includeFiles": ["dist/**"]}
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "dist/index.js",
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+            "header": {
+                "Access-Control-ALlow-Credentials" : "true",
+                "Access-Control-ALlow-Origin" : "*",
+                "Access-Control-ALlow-methods" : "GET, OPTIONS, PATCH, POST, PUT, DELETE",
+                "Access-Control-ALlow-Headers" : "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+            }
+        }
+    ]
+}
