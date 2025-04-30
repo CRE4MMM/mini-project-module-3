@@ -51,7 +51,7 @@ class AuthController {
                     role: "CUSTOMER",
                     referralCode,
                     referredBy: referredBy || null,
-                    isVerified: false
+                    isVerified: true
                 }
             });
 
@@ -128,13 +128,6 @@ class AuthController {
                 return res.status(401).json({
                     success: false,
                     message: "Invalid email or password"
-                });
-            }
-
-            if (!user.isVerified && user.role === "CUSTOMER") {
-                return res.status(403).json({
-                    success: false,
-                    message: "Please verify your email before signing in"
                 });
             }
 
