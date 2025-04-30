@@ -14,20 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const prisma_1 = require("../configs/prisma");
 const hashPassword_1 = require("../utils/hashPassword");
-const createToken_1 = require("../utils/createToken");
-const nodemailer_1 = require("../configs/nodemailer");
 const referralGen_1 = require("../utils/referralGen");
+const createToken_1 = require("../utils/createToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 class AuthController {
-    registCust(req, res, next) {
+    signUp(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { email, password, firstName, lastName, referredBy } = req.body;
-                if (!email || !password || !firstName || !lastName) {
-                    return res.status(400).send({
-                        success: false,
-                        message: "All fields are required"
-                    });
+                const { firstName, lastName, email, password, role, referredBy } = req.body;
+                if (!firstName || !lastName || !email || !password || !role) {
+                    return res.status(400).json({ message: 'all fields required' });
+                }
+                if (!['CUSTOMER', 'ORGANIZER'].includes(role)) {
+                    return res.status(400).json({ message: 'invalid role' });
                 }
                 const isExist = yield prisma_1.prisma.user.findUnique({ where: { email } });
                 if (isExist) {
@@ -36,6 +35,8 @@ class AuthController {
                         message: `${email} is already in use, please use another email`
                     });
                 }
+                const hashedPassword = yield (0, hashPassword_1.hashPassword)(password);
+                const referralCode = (0, referralGen_1.generateReferral)();
                 let referringUser = null;
                 if (referredBy) {
                     referringUser = yield prisma_1.prisma.user.findUnique({
@@ -48,79 +49,39 @@ class AuthController {
                         });
                     }
                 }
-                const hashedPassword = yield (0, hashPassword_1.hashPassword)(password);
-                const referralCode = (0, referralGen_1.generateReferral)();
                 const newUser = yield prisma_1.prisma.user.create({
                     data: {
-                        email,
-                        password: hashedPassword,
                         firstName,
                         lastName,
-                        role: "CUSTOMER",
+                        email,
+                        password: hashedPassword,
+                        role,
                         referralCode,
                         referredBy: referredBy || null,
-                        isVerified: false
-                    }
-                });
-                const token = (0, createToken_1.createToken)({
-                    id: newUser.id,
-                    email: newUser.email,
-                    role: newUser.role
-                });
-                yield nodemailer_1.transporter.sendMail({
-                    from: process.env.MAIL_SENDER,
-                    to: email,
-                    subject: "Verify Your Account Registration",
-                    html: `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h2>Thank you for registering your account</h2>
-                    <p>Click the button below to verify your email address:</p>
-                    <a href="${process.env.FE_URL}/verify?token=${token}" 
-                        style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
-                        Verify Account
-                    </a>
-                    <p>If you didn't create this account, please ignore this email.</p>
-                </div>
-                `
+                        isVerified: true,
+                    },
                 });
                 return res.status(201).send({
                     success: true,
-                    message: "Registration successful! Please check your email to verify your account."
-                });
-            }
-            catch (error) {
-                next(error);
-            }
-        });
-    }
-    registOrg(req, res, next) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { email, password, firstName, lastName } = req.body;
-                if (!email || !password || !firstName || !lastName) {
-                    return res.status(400).json({ message: "All fields are required" });
-                }
-                const isExist = yield prisma_1.prisma.user.findUnique({ where: { email } });
-                if (isExist) {
-                    return res.status(400).json({ message: "Email already exists" });
-                }
-                const hashedPassword = yield (0, hashPassword_1.hashPassword)(password);
-                const referralCode = (0, referralGen_1.generateReferral)();
-                const organizer = yield prisma_1.prisma.user.create({
+                    message: 'Signup successful',
                     data: {
-                        email,
-                        password: hashedPassword,
-                        firstName,
-                        lastName,
-                        role: 'ORGANIZER',
-                        referralCode,
-                        isVerified: true
-                    }
+                        id: newUser.id,
+                        firstName: newUser.firstName,
+                        lastName: newUser.lastName,
+                        email: newUser.email,
+                        role: newUser.role,
+                        referralCode: newUser.referralCode,
+                        referredBy: newUser.referredBy,
+                        isVerified: newUser.isVerified,
+                    },
                 });
-                return res.status(201).json({ message: "Event organizer created", data: organizer });
             }
             catch (error) {
-                next(error);
+                console.error(error);
+                return res.status(500).send({
+                    success: false,
+                    message: 'Server error during signup',
+                });
             }
         });
     }
@@ -131,33 +92,27 @@ class AuthController {
                 if (!email || !password) {
                     return res.status(400).json({
                         success: false,
-                        message: "Email and password are required"
+                        message: "Email and password are required",
                     });
                 }
                 const user = yield prisma_1.prisma.user.findUnique({ where: { email } });
                 if (!user) {
                     return res.status(401).json({
                         success: false,
-                        message: "Invalid email or password"
+                        message: "Invalid email or password",
                     });
                 }
                 const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
                 if (!isPasswordValid) {
                     return res.status(401).json({
                         success: false,
-                        message: "Invalid email or password"
-                    });
-                }
-                if (!user.isVerified && user.role === "CUSTOMER") {
-                    return res.status(403).json({
-                        success: false,
-                        message: "Please verify your email before signing in"
+                        message: "Invalid email or password",
                     });
                 }
                 const token = (0, createToken_1.createToken)({
                     id: user.id,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
                 });
                 return res.status(200).json({
                     success: true,
@@ -169,13 +124,17 @@ class AuthController {
                             email: user.email,
                             firstName: user.firstName,
                             lastName: user.lastName,
-                            role: user.role
-                        }
-                    }
+                            role: user.role,
+                        },
+                    },
                 });
             }
             catch (error) {
-                next(error);
+                console.error(error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Server error during sign-in",
+                });
             }
         });
     }
