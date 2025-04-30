@@ -65,14 +65,13 @@ export default function SignInPage() {
             throw new Error(data.message || 'Failed to sign in')
         }
 
-        // Save the token and user info to localStorage or a state management solution
         localStorage.setItem('token', data.data.token)
         localStorage.setItem('user', JSON.stringify(data.data.user))
 
         if (data.data.user.role === 'CUSTOMER') {
-            router.push('/events')
-        } else if (data.data.user.role === 'ORGANIZER') {
             router.push('/dashboard-customer')
+        } else if (data.data.user.role === 'ORGANIZER') {
+            router.push('/dashboard-organizer')
         }
         } catch (err) {
         setError(
@@ -150,7 +149,7 @@ export default function SignInPage() {
                 <p className="text-center text-sm text-gray-600">
                     Don&apos;t have an account?{' '}
                     <Link
-                    href="/signup"
+                    href="/sign-up"
                     className="font-medium text-blue-600 hover:text-blue-500"
                     >
                     Sign up

@@ -5,6 +5,7 @@ import { createToken } from "../utils/createToken";
 import { transporter } from "../configs/nodemailer";
 import { generateReferral } from "../utils/referralGen";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 class AuthController {
     async registCust(req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -85,6 +86,52 @@ class AuthController {
             });
         } catch (error) {
             next(error);
+        }
+    }
+
+    async verifyAccount(req: Request, res: Response, next: NextFunction): Promise<any> {
+        try {
+            const { token } = req.query
+
+            if (!token || typeof token !== 'string') {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Verification is required'
+                })
+            }
+
+            const decoded = jwt.verify(
+                token,
+                process.env.JWT_SECRET ||
+                '76c70af5e5c05dd1bde258fe53d97872cf4836116741fd512c5e57b5810df082'
+            ) as {id: string; email: string; role: string;}
+
+            const user = await prisma.user.findUnique({
+                where: {id: decoded.id}
+            })
+
+            if (!user) {
+                return res.status(404).send({
+                    success: false,
+                    message: 'User not found'
+                })
+            }
+
+            if (user.isVerified) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Account already verified'
+                })
+            }
+
+            await prisma.user.update({
+                where: {id: decoded.id},
+                data: {isVerified: true}
+            })
+
+            return res.redirect(`${process.env.FE_URL}/verify-success`)
+        } catch (error) {
+            next(error)
         }
     }
 
@@ -179,6 +226,14 @@ class AuthController {
         } catch (error) {
             next(error);
         }
+    }
+
+    async keepSignIn(req: Request, res: Response, next: NextFunction): Promise<any> {
+
+    }
+
+    async signOut(req: Request, res: Response, next: NextFunction): Promise<any> {
+
     }
 }
 

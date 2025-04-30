@@ -46,7 +46,6 @@ export default function SignupPage() {
     setError('')
     setSuccess('')
 
-    // Basic validation
     if (
       !formData.firstName ||
       !formData.lastName ||
@@ -96,7 +95,6 @@ export default function SignupPage() {
           : 'Event organizer account created successfully!'
       )
 
-      // For organizers, redirect to sign in page after a delay
       if (userType === 'organizer') {
         setTimeout(() => {
           router.push('/signin')
@@ -240,7 +238,7 @@ export default function SignupPage() {
                   <p className="text-center text-sm text-gray-600">
                     Already have an account?{' '}
                     <Link
-                      href="/signin"
+                      href="/sign-in"
                       className="font-medium text-blue-600 hover:text-blue-500"
                     >
                       Sign in
