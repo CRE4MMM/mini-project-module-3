@@ -163,13 +163,55 @@ class AuthController {
         }
     }
 
-    async keepSignIn(req: Request, res: Response, next: NextFunction): Promise<any> {
+        async keepSignIn(req: Request, res: Response, next: NextFunction): Promise<any> {
+        try {
+            const userData = req.user;
 
+            if (!userData) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Unauthorized"
+                });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: userData.id },
+                select: {
+                    id: true,
+                    email: true,
+                    firstName: true,
+                    lastName: true,
+                    role: true
+                }
+            });
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found"
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: user
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 
     async signOut(req: Request, res: Response, next: NextFunction): Promise<any> {
-
+        try {
+            return res.status(200).json({
+                success: true,
+                message: "Signed out successfully"
+            });
+        } catch (error) {
+            next(error);
+        }
     }
+
 }
 
 export default new AuthController();

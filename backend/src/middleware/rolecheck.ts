@@ -7,12 +7,18 @@ interface JwtPayload {
     role: string
 }
 
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: JwtPayload
+    }
+}
+
 export const protectWithRole = (allowedRoles: string[]): RequestHandler => {
-    return (req: Request, res: Response, next: NextFunction): void => {
+    return (req: Request, res: Response, next: NextFunction) => {
         const authHeader = req.headers.authorization
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            res.status(401).json({ message: 'Unauthorized' })
+            res.status(401).json({ message: 'Unauthorized: No token provided' })
             return
         }
 
@@ -26,10 +32,10 @@ export const protectWithRole = (allowedRoles: string[]): RequestHandler => {
                 return
             }
 
+            req.user = decoded
             next()
         } catch (err) {
             res.status(401).json({ message: 'Unauthorized: Invalid token' })
         }
     }
 }
-
