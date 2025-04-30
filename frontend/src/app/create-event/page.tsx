@@ -40,6 +40,7 @@ import {
 import { cn } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-react'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
+import { useAuth } from '@/context/AuthContext'
 
 const formSchema = z
     .object({
@@ -139,6 +140,8 @@ export default function CreateEventPage() {
         },
     })
 
+    const { token } = useAuth()
+
     async function onSubmit(values: FormValues) {
         setIsSubmitting(true)
 
@@ -160,11 +163,20 @@ export default function CreateEventPage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(eventData),
         })
 
-        const result = await response.json()
+        let result
+        const rawText = await response.text()
+
+        try {
+          result = JSON.parse(rawText)
+        } catch {
+          throw new Error(`Invalid response format: ${rawText.slice(0, 100)}`)
+        }
+
 
         if (result.success) {
             setToast({ message: 'Event created successfully', type: 'success' })
