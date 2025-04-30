@@ -2,11 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../configs/prisma";
 import { hashPassword } from "../utils/hashPassword";
 import { createToken } from "../utils/createToken";
-import { transporter } from "../configs/nodemailer";
 import { generateReferral } from "../utils/referralGen";
 import bcrypt from "bcrypt";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { decode } from "punycode";
 
 class AuthController {
     async registCust(req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -64,75 +61,12 @@ class AuthController {
                 role: newUser.role
             });
 
-            await transporter.sendMail({
-                from: process.env.MAIL_SENDER,
-                to: email,
-                subject: "Verify Your Account Registration",
-                html: `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h2>Thank you for registering your account</h2>
-                    <p>Click the button below to verify your email address:</p>
-                    <a href="${process.env.FE_URL}/verify?token=${token}" 
-                        style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
-                        Verify Account
-                    </a>
-                    <p>If you didn't create this account, please ignore this email.</p>
-                </div>
-                `
-            });
-
             return res.status(201).send({
                 success: true,
-                message: "Registration successful! Please check your email to verify your account."
+                message: "Registration successful!"
             });
         } catch (error) {
             next(error);
-        }
-    }
-
-    async verifyAccount(req: Request, res: Response, next: NextFunction): Promise<any> {
-        try {
-            const { token } = req.query
-
-            if (!token || typeof token !== 'string') {
-                return res.status(400).send({
-                    success: false,
-                    message: 'Verification is required'
-                })
-            }
-
-            const decoded = jwt.verify(
-                token,
-                process.env.JWT_SECRET ||
-                'fallback'
-            ) as JwtPayload
-
-            const user = await prisma.user.findUnique({
-                where: {id: decoded.id}
-            })
-
-            if (!user) {
-                return res.status(404).send({
-                    success: false,
-                    message: 'User not found'
-                })
-            }
-
-            if (user.isVerified) {
-                return res.status(400).send({
-                    success: false,
-                    message: 'Account already verified'
-                })
-            }
-
-            await prisma.user.update({
-                where: {id: decoded.id},
-                data: {isVerified: true}
-            })
-
-            return res.redirect(`${process.env.FE_URL}/verify-success`)
-        } catch (error) {
-            next(error)
         }
     }
 
