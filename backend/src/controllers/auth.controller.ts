@@ -1,106 +1,82 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../configs/prisma";
 import { hashPassword } from "../utils/hashPassword";
-import { createToken } from "../utils/createToken";
 import { generateReferral } from "../utils/referralGen";
-import bcrypt from "bcrypt";
+import { createToken } from "../utils/createToken";
+import bcrypt from 'bcrypt'
 
 class AuthController {
-    async registCust(req: Request, res: Response, next: NextFunction): Promise<any> {
+    async signUp(req: Request, res: Response, next: NextFunction): Promise<any> {
         try {
-            const { email, password, firstName, lastName, referredBy } = req.body;
+            const { firstName, lastName, email, password, role, referredBy } = req.body
 
-            if (!email || !password || !firstName || !lastName) {
-                return res.status(400).send({
-                    success: false,
-                    message: "All fields are required"
-                });
-            }
-
-            const isExist = await prisma.user.findUnique({ where: { email } });
-            if (isExist) {
-                return res.status(400).send({
-                    success: false,
-                    message: `${email} is already in use, please use another email`
-                });
-            }
-
-            let referringUser = null;
-            if (referredBy) {
-                referringUser = await prisma.user.findUnique({
-                    where: { referralCode: referredBy }
-                });
-
-                if (!referringUser) {
-                    return res.status(400).send({
-                        success: false,
-                        message: "Invalid referral code"
-                    });
-                }
-            }
-
-            const hashedPassword = await hashPassword(password);
-            const referralCode = generateReferral()
-
-            const newUser = await prisma.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    firstName,
-                    lastName,
-                    role: "CUSTOMER",
-                    referralCode,
-                    referredBy: referredBy || null,
-                    isVerified: true
-                }
-            });
-
-            const token = createToken({
-                id: newUser.id,
-                email: newUser.email,
-                role: newUser.role
-            });
-
-            return res.status(201).send({
-                success: true,
-                message: "Registration successful!"
-            });
-        } catch (error) {
-            next(error);
+        if (!firstName || !lastName || !email || !password || !role) {
+            return res.status(400).json({message: 'all fields required'})
         }
-    }
 
-    async registOrg(req: Request, res: Response, next: NextFunction): Promise<any> {
-        try {
-            const { email, password, firstName, lastName } = req.body;
+        if (!['CUSTOMER', 'ORGANIZER'].includes(role)) {
+            return res.status(400).json({message: 'invalid role'})
+        }
 
-            if (!email || !password || !firstName || !lastName) {
-                return res.status(400).json({ message: "All fields are required" });
-            }
+        const isExist = await prisma.user.findUnique({where: {email}})
+        if(isExist) {
+            return res.status(400).send({
+                success: false,
+                message: `${email} is already in use, please use another email`
+            })
+        }
 
-            const isExist = await prisma.user.findUnique({ where: { email } });
-            if (isExist) {
-                return res.status(400).json({ message: "Email already exists" });
-            }
+        const hashedPassword = await hashPassword(password)
+        const referralCode = generateReferral()
 
-            const hashedPassword = await hashPassword(password);
-            const referralCode = generateReferral()
-
-            const organizer = await prisma.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    firstName,
-                    lastName,
-                    role: 'ORGANIZER',
-                    referralCode,
-                    isVerified: true
-                }
+        let referringUser = null;
+        if (referredBy) {
+            referringUser = await prisma.user.findUnique({
+                where: { referralCode: referredBy }
             });
 
-            return res.status(201).json({ message: "Event organizer created", data: organizer });
+            if (!referringUser) {
+                return res.status(400).send({
+                    success: false,
+                    message: "Invalid referral code"
+                });
+            }
+        }
+
+        const newUser = await prisma.user.create({
+            data: {
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword,
+                role,
+                referralCode,
+                referredBy: referredBy || null,
+                isVerified: true,
+            },
+        });
+
+
+        return res.status(201).send({
+            success: true,
+            message: 'Signup successful',
+            data: {
+                id: newUser.id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                role: newUser.role,
+                referralCode: newUser.referralCode,
+                referredBy: newUser.referredBy,
+                isVerified: newUser.isVerified,
+            },
+        });
         } catch (error) {
-            next(error);
+            console.error(error);
+            return res.status(500).send({
+                success: false,
+                message: 'Server error during signup',
+            });
         }
     }
 
@@ -111,7 +87,7 @@ class AuthController {
             if (!email || !password) {
                 return res.status(400).json({
                     success: false,
-                    message: "Email and password are required"
+                    message: "Email and password are required",
                 });
             }
 
@@ -119,7 +95,7 @@ class AuthController {
             if (!user) {
                 return res.status(401).json({
                     success: false,
-                    message: "Invalid email or password"
+                    message: "Invalid email or password",
                 });
             }
 
@@ -127,14 +103,14 @@ class AuthController {
             if (!isPasswordValid) {
                 return res.status(401).json({
                     success: false,
-                    message: "Invalid email or password"
+                    message: "Invalid email or password",
                 });
             }
 
             const token = createToken({
                 id: user.id,
                 email: user.email,
-                role: user.role
+                role: user.role,
             });
 
             return res.status(200).json({
@@ -147,64 +123,18 @@ class AuthController {
                         email: user.email,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        role: user.role
-                    }
-                }
+                        role: user.role,
+                    },
+                },
             });
         } catch (error) {
-            next(error);
+            console.error(error);
+            return res.status(500).json({
+                success: false,
+                message: "Server error during sign-in",
+            });
         }
     }
-
-        async keepSignIn(req: Request, res: Response, next: NextFunction): Promise<any> {
-        try {
-            const userData = req.user;
-
-            if (!userData) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Unauthorized"
-                });
-            }
-
-            const user = await prisma.user.findUnique({
-                where: { id: userData.id },
-                select: {
-                    id: true,
-                    email: true,
-                    firstName: true,
-                    lastName: true,
-                    role: true
-                }
-            });
-
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: "User not found"
-                });
-            }
-
-            return res.status(200).json({
-                success: true,
-                data: user
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async signOut(req: Request, res: Response, next: NextFunction): Promise<any> {
-        try {
-            return res.status(200).json({
-                success: true,
-                message: "Signed out successfully"
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
 }
 
 export default new AuthController();

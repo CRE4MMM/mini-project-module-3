@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label'
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -93,9 +92,6 @@ export default function SignInPage() {
             <Card>
             <CardHeader>
                 <CardTitle>Sign In</CardTitle>
-                <CardDescription>
-                Enter your credentials to access your account
-                </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
