@@ -3,6 +3,7 @@ dotenv.config()
 import cors from 'cors'
 import express, { Request, Response, NextFunction, Application } from 'express'
 import authRouter from './routers/auth.router'
+import eventRouter from './routers/event.router'
 
 const PORT = process.env.PORT || 9009
 class App {
@@ -25,6 +26,7 @@ class App {
         })
 
         this.app.use('/auth', authRouter)
+        this.app.use('/event', eventRouter)
     }
 
     public start(): void {

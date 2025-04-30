@@ -18,6 +18,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model EvtItem
+ * 
+ */
+export type EvtItem = $Result.DefaultSelection<Prisma.$EvtItemPayload>
 
 /**
  * Enums
@@ -170,6 +175,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.evtItem`: Exposes CRUD operations for the **EvtItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EvtItems
+    * const evtItems = await prisma.evtItem.findMany()
+    * ```
+    */
+  get evtItem(): Prisma.EvtItemDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -610,7 +625,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    User: 'User'
+    User: 'User',
+    EvtItem: 'EvtItem'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -629,7 +645,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user"
+      modelProps: "user" | "evtItem"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -704,6 +720,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      EvtItem: {
+        payload: Prisma.$EvtItemPayload<ExtArgs>
+        fields: Prisma.EvtItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EvtItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EvtItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          findFirst: {
+            args: Prisma.EvtItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EvtItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          findMany: {
+            args: Prisma.EvtItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>[]
+          }
+          create: {
+            args: Prisma.EvtItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          createMany: {
+            args: Prisma.EvtItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EvtItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>[]
+          }
+          delete: {
+            args: Prisma.EvtItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          update: {
+            args: Prisma.EvtItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.EvtItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EvtItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EvtItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.EvtItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EvtItemPayload>
+          }
+          aggregate: {
+            args: Prisma.EvtItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEvtItem>
+          }
+          groupBy: {
+            args: Prisma.EvtItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EvtItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EvtItemCountArgs<ExtArgs>
+            result: $Utils.Optional<EvtItemCountAggregateOutputType> | number
           }
         }
       }
@@ -792,6 +882,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    evtItem?: EvtItemOmit
   }
 
   /* Types for Logging */
@@ -1960,6 +2051,1095 @@ export namespace Prisma {
 
 
   /**
+   * Model EvtItem
+   */
+
+  export type AggregateEvtItem = {
+    _count: EvtItemCountAggregateOutputType | null
+    _avg: EvtItemAvgAggregateOutputType | null
+    _sum: EvtItemSumAggregateOutputType | null
+    _min: EvtItemMinAggregateOutputType | null
+    _max: EvtItemMaxAggregateOutputType | null
+  }
+
+  export type EvtItemAvgAggregateOutputType = {
+    id: number | null
+    price: number | null
+    availableSeats: number | null
+  }
+
+  export type EvtItemSumAggregateOutputType = {
+    id: number | null
+    price: number | null
+    availableSeats: number | null
+  }
+
+  export type EvtItemMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    description: string | null
+    price: number | null
+    startDate: Date | null
+    endDate: Date | null
+    location: string | null
+    category: string | null
+    availableSeats: number | null
+  }
+
+  export type EvtItemMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    description: string | null
+    price: number | null
+    startDate: Date | null
+    endDate: Date | null
+    location: string | null
+    category: string | null
+    availableSeats: number | null
+  }
+
+  export type EvtItemCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    price: number
+    startDate: number
+    endDate: number
+    location: number
+    category: number
+    availableSeats: number
+    _all: number
+  }
+
+
+  export type EvtItemAvgAggregateInputType = {
+    id?: true
+    price?: true
+    availableSeats?: true
+  }
+
+  export type EvtItemSumAggregateInputType = {
+    id?: true
+    price?: true
+    availableSeats?: true
+  }
+
+  export type EvtItemMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    startDate?: true
+    endDate?: true
+    location?: true
+    category?: true
+    availableSeats?: true
+  }
+
+  export type EvtItemMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    startDate?: true
+    endDate?: true
+    location?: true
+    category?: true
+    availableSeats?: true
+  }
+
+  export type EvtItemCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    startDate?: true
+    endDate?: true
+    location?: true
+    category?: true
+    availableSeats?: true
+    _all?: true
+  }
+
+  export type EvtItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EvtItem to aggregate.
+     */
+    where?: EvtItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EvtItems to fetch.
+     */
+    orderBy?: EvtItemOrderByWithRelationInput | EvtItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EvtItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EvtItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EvtItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EvtItems
+    **/
+    _count?: true | EvtItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EvtItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EvtItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EvtItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EvtItemMaxAggregateInputType
+  }
+
+  export type GetEvtItemAggregateType<T extends EvtItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateEvtItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEvtItem[P]>
+      : GetScalarType<T[P], AggregateEvtItem[P]>
+  }
+
+
+
+
+  export type EvtItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EvtItemWhereInput
+    orderBy?: EvtItemOrderByWithAggregationInput | EvtItemOrderByWithAggregationInput[]
+    by: EvtItemScalarFieldEnum[] | EvtItemScalarFieldEnum
+    having?: EvtItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EvtItemCountAggregateInputType | true
+    _avg?: EvtItemAvgAggregateInputType
+    _sum?: EvtItemSumAggregateInputType
+    _min?: EvtItemMinAggregateInputType
+    _max?: EvtItemMaxAggregateInputType
+  }
+
+  export type EvtItemGroupByOutputType = {
+    id: number
+    name: string
+    description: string
+    price: number
+    startDate: Date
+    endDate: Date
+    location: string
+    category: string
+    availableSeats: number
+    _count: EvtItemCountAggregateOutputType | null
+    _avg: EvtItemAvgAggregateOutputType | null
+    _sum: EvtItemSumAggregateOutputType | null
+    _min: EvtItemMinAggregateOutputType | null
+    _max: EvtItemMaxAggregateOutputType | null
+  }
+
+  type GetEvtItemGroupByPayload<T extends EvtItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EvtItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EvtItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EvtItemGroupByOutputType[P]>
+            : GetScalarType<T[P], EvtItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EvtItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    location?: boolean
+    category?: boolean
+    availableSeats?: boolean
+  }, ExtArgs["result"]["evtItem"]>
+
+  export type EvtItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    location?: boolean
+    category?: boolean
+    availableSeats?: boolean
+  }, ExtArgs["result"]["evtItem"]>
+
+  export type EvtItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    location?: boolean
+    category?: boolean
+    availableSeats?: boolean
+  }, ExtArgs["result"]["evtItem"]>
+
+  export type EvtItemSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    location?: boolean
+    category?: boolean
+    availableSeats?: boolean
+  }
+
+  export type EvtItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "price" | "startDate" | "endDate" | "location" | "category" | "availableSeats", ExtArgs["result"]["evtItem"]>
+
+  export type $EvtItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EvtItem"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      description: string
+      price: number
+      startDate: Date
+      endDate: Date
+      location: string
+      category: string
+      availableSeats: number
+    }, ExtArgs["result"]["evtItem"]>
+    composites: {}
+  }
+
+  type EvtItemGetPayload<S extends boolean | null | undefined | EvtItemDefaultArgs> = $Result.GetResult<Prisma.$EvtItemPayload, S>
+
+  type EvtItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EvtItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EvtItemCountAggregateInputType | true
+    }
+
+  export interface EvtItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EvtItem'], meta: { name: 'EvtItem' } }
+    /**
+     * Find zero or one EvtItem that matches the filter.
+     * @param {EvtItemFindUniqueArgs} args - Arguments to find a EvtItem
+     * @example
+     * // Get one EvtItem
+     * const evtItem = await prisma.evtItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EvtItemFindUniqueArgs>(args: SelectSubset<T, EvtItemFindUniqueArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EvtItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EvtItemFindUniqueOrThrowArgs} args - Arguments to find a EvtItem
+     * @example
+     * // Get one EvtItem
+     * const evtItem = await prisma.evtItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EvtItemFindUniqueOrThrowArgs>(args: SelectSubset<T, EvtItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EvtItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemFindFirstArgs} args - Arguments to find a EvtItem
+     * @example
+     * // Get one EvtItem
+     * const evtItem = await prisma.evtItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EvtItemFindFirstArgs>(args?: SelectSubset<T, EvtItemFindFirstArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EvtItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemFindFirstOrThrowArgs} args - Arguments to find a EvtItem
+     * @example
+     * // Get one EvtItem
+     * const evtItem = await prisma.evtItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EvtItemFindFirstOrThrowArgs>(args?: SelectSubset<T, EvtItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EvtItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EvtItems
+     * const evtItems = await prisma.evtItem.findMany()
+     * 
+     * // Get first 10 EvtItems
+     * const evtItems = await prisma.evtItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const evtItemWithIdOnly = await prisma.evtItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EvtItemFindManyArgs>(args?: SelectSubset<T, EvtItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EvtItem.
+     * @param {EvtItemCreateArgs} args - Arguments to create a EvtItem.
+     * @example
+     * // Create one EvtItem
+     * const EvtItem = await prisma.evtItem.create({
+     *   data: {
+     *     // ... data to create a EvtItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends EvtItemCreateArgs>(args: SelectSubset<T, EvtItemCreateArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EvtItems.
+     * @param {EvtItemCreateManyArgs} args - Arguments to create many EvtItems.
+     * @example
+     * // Create many EvtItems
+     * const evtItem = await prisma.evtItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EvtItemCreateManyArgs>(args?: SelectSubset<T, EvtItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EvtItems and returns the data saved in the database.
+     * @param {EvtItemCreateManyAndReturnArgs} args - Arguments to create many EvtItems.
+     * @example
+     * // Create many EvtItems
+     * const evtItem = await prisma.evtItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EvtItems and only return the `id`
+     * const evtItemWithIdOnly = await prisma.evtItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EvtItemCreateManyAndReturnArgs>(args?: SelectSubset<T, EvtItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EvtItem.
+     * @param {EvtItemDeleteArgs} args - Arguments to delete one EvtItem.
+     * @example
+     * // Delete one EvtItem
+     * const EvtItem = await prisma.evtItem.delete({
+     *   where: {
+     *     // ... filter to delete one EvtItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EvtItemDeleteArgs>(args: SelectSubset<T, EvtItemDeleteArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EvtItem.
+     * @param {EvtItemUpdateArgs} args - Arguments to update one EvtItem.
+     * @example
+     * // Update one EvtItem
+     * const evtItem = await prisma.evtItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EvtItemUpdateArgs>(args: SelectSubset<T, EvtItemUpdateArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EvtItems.
+     * @param {EvtItemDeleteManyArgs} args - Arguments to filter EvtItems to delete.
+     * @example
+     * // Delete a few EvtItems
+     * const { count } = await prisma.evtItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EvtItemDeleteManyArgs>(args?: SelectSubset<T, EvtItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EvtItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EvtItems
+     * const evtItem = await prisma.evtItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EvtItemUpdateManyArgs>(args: SelectSubset<T, EvtItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EvtItems and returns the data updated in the database.
+     * @param {EvtItemUpdateManyAndReturnArgs} args - Arguments to update many EvtItems.
+     * @example
+     * // Update many EvtItems
+     * const evtItem = await prisma.evtItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EvtItems and only return the `id`
+     * const evtItemWithIdOnly = await prisma.evtItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EvtItemUpdateManyAndReturnArgs>(args: SelectSubset<T, EvtItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EvtItem.
+     * @param {EvtItemUpsertArgs} args - Arguments to update or create a EvtItem.
+     * @example
+     * // Update or create a EvtItem
+     * const evtItem = await prisma.evtItem.upsert({
+     *   create: {
+     *     // ... data to create a EvtItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EvtItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EvtItemUpsertArgs>(args: SelectSubset<T, EvtItemUpsertArgs<ExtArgs>>): Prisma__EvtItemClient<$Result.GetResult<Prisma.$EvtItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EvtItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemCountArgs} args - Arguments to filter EvtItems to count.
+     * @example
+     * // Count the number of EvtItems
+     * const count = await prisma.evtItem.count({
+     *   where: {
+     *     // ... the filter for the EvtItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends EvtItemCountArgs>(
+      args?: Subset<T, EvtItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EvtItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EvtItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EvtItemAggregateArgs>(args: Subset<T, EvtItemAggregateArgs>): Prisma.PrismaPromise<GetEvtItemAggregateType<T>>
+
+    /**
+     * Group by EvtItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EvtItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EvtItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EvtItemGroupByArgs['orderBy'] }
+        : { orderBy?: EvtItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EvtItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEvtItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EvtItem model
+   */
+  readonly fields: EvtItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EvtItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EvtItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EvtItem model
+   */
+  interface EvtItemFieldRefs {
+    readonly id: FieldRef<"EvtItem", 'Int'>
+    readonly name: FieldRef<"EvtItem", 'String'>
+    readonly description: FieldRef<"EvtItem", 'String'>
+    readonly price: FieldRef<"EvtItem", 'Int'>
+    readonly startDate: FieldRef<"EvtItem", 'DateTime'>
+    readonly endDate: FieldRef<"EvtItem", 'DateTime'>
+    readonly location: FieldRef<"EvtItem", 'String'>
+    readonly category: FieldRef<"EvtItem", 'String'>
+    readonly availableSeats: FieldRef<"EvtItem", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EvtItem findUnique
+   */
+  export type EvtItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter, which EvtItem to fetch.
+     */
+    where: EvtItemWhereUniqueInput
+  }
+
+  /**
+   * EvtItem findUniqueOrThrow
+   */
+  export type EvtItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter, which EvtItem to fetch.
+     */
+    where: EvtItemWhereUniqueInput
+  }
+
+  /**
+   * EvtItem findFirst
+   */
+  export type EvtItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter, which EvtItem to fetch.
+     */
+    where?: EvtItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EvtItems to fetch.
+     */
+    orderBy?: EvtItemOrderByWithRelationInput | EvtItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EvtItems.
+     */
+    cursor?: EvtItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EvtItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EvtItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EvtItems.
+     */
+    distinct?: EvtItemScalarFieldEnum | EvtItemScalarFieldEnum[]
+  }
+
+  /**
+   * EvtItem findFirstOrThrow
+   */
+  export type EvtItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter, which EvtItem to fetch.
+     */
+    where?: EvtItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EvtItems to fetch.
+     */
+    orderBy?: EvtItemOrderByWithRelationInput | EvtItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EvtItems.
+     */
+    cursor?: EvtItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EvtItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EvtItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EvtItems.
+     */
+    distinct?: EvtItemScalarFieldEnum | EvtItemScalarFieldEnum[]
+  }
+
+  /**
+   * EvtItem findMany
+   */
+  export type EvtItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter, which EvtItems to fetch.
+     */
+    where?: EvtItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EvtItems to fetch.
+     */
+    orderBy?: EvtItemOrderByWithRelationInput | EvtItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EvtItems.
+     */
+    cursor?: EvtItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EvtItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EvtItems.
+     */
+    skip?: number
+    distinct?: EvtItemScalarFieldEnum | EvtItemScalarFieldEnum[]
+  }
+
+  /**
+   * EvtItem create
+   */
+  export type EvtItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * The data needed to create a EvtItem.
+     */
+    data: XOR<EvtItemCreateInput, EvtItemUncheckedCreateInput>
+  }
+
+  /**
+   * EvtItem createMany
+   */
+  export type EvtItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EvtItems.
+     */
+    data: EvtItemCreateManyInput | EvtItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EvtItem createManyAndReturn
+   */
+  export type EvtItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many EvtItems.
+     */
+    data: EvtItemCreateManyInput | EvtItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EvtItem update
+   */
+  export type EvtItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * The data needed to update a EvtItem.
+     */
+    data: XOR<EvtItemUpdateInput, EvtItemUncheckedUpdateInput>
+    /**
+     * Choose, which EvtItem to update.
+     */
+    where: EvtItemWhereUniqueInput
+  }
+
+  /**
+   * EvtItem updateMany
+   */
+  export type EvtItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EvtItems.
+     */
+    data: XOR<EvtItemUpdateManyMutationInput, EvtItemUncheckedUpdateManyInput>
+    /**
+     * Filter which EvtItems to update
+     */
+    where?: EvtItemWhereInput
+    /**
+     * Limit how many EvtItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EvtItem updateManyAndReturn
+   */
+  export type EvtItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * The data used to update EvtItems.
+     */
+    data: XOR<EvtItemUpdateManyMutationInput, EvtItemUncheckedUpdateManyInput>
+    /**
+     * Filter which EvtItems to update
+     */
+    where?: EvtItemWhereInput
+    /**
+     * Limit how many EvtItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EvtItem upsert
+   */
+  export type EvtItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * The filter to search for the EvtItem to update in case it exists.
+     */
+    where: EvtItemWhereUniqueInput
+    /**
+     * In case the EvtItem found by the `where` argument doesn't exist, create a new EvtItem with this data.
+     */
+    create: XOR<EvtItemCreateInput, EvtItemUncheckedCreateInput>
+    /**
+     * In case the EvtItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EvtItemUpdateInput, EvtItemUncheckedUpdateInput>
+  }
+
+  /**
+   * EvtItem delete
+   */
+  export type EvtItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+    /**
+     * Filter which EvtItem to delete.
+     */
+    where: EvtItemWhereUniqueInput
+  }
+
+  /**
+   * EvtItem deleteMany
+   */
+  export type EvtItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EvtItems to delete
+     */
+    where?: EvtItemWhereInput
+    /**
+     * Limit how many EvtItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EvtItem without action
+   */
+  export type EvtItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EvtItem
+     */
+    select?: EvtItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EvtItem
+     */
+    omit?: EvtItemOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -1988,6 +3168,21 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const EvtItemScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    price: 'price',
+    startDate: 'startDate',
+    endDate: 'endDate',
+    location: 'location',
+    category: 'category',
+    availableSeats: 'availableSeats'
+  };
+
+  export type EvtItemScalarFieldEnum = (typeof EvtItemScalarFieldEnum)[keyof typeof EvtItemScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -2080,6 +3275,20 @@ export namespace Prisma {
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
   /**
    * Deep Input Types
    */
@@ -2165,6 +3374,80 @@ export namespace Prisma {
     referredBy?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type EvtItemWhereInput = {
+    AND?: EvtItemWhereInput | EvtItemWhereInput[]
+    OR?: EvtItemWhereInput[]
+    NOT?: EvtItemWhereInput | EvtItemWhereInput[]
+    id?: IntFilter<"EvtItem"> | number
+    name?: StringFilter<"EvtItem"> | string
+    description?: StringFilter<"EvtItem"> | string
+    price?: IntFilter<"EvtItem"> | number
+    startDate?: DateTimeFilter<"EvtItem"> | Date | string
+    endDate?: DateTimeFilter<"EvtItem"> | Date | string
+    location?: StringFilter<"EvtItem"> | string
+    category?: StringFilter<"EvtItem"> | string
+    availableSeats?: IntFilter<"EvtItem"> | number
+  }
+
+  export type EvtItemOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    location?: SortOrder
+    category?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type EvtItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: EvtItemWhereInput | EvtItemWhereInput[]
+    OR?: EvtItemWhereInput[]
+    NOT?: EvtItemWhereInput | EvtItemWhereInput[]
+    name?: StringFilter<"EvtItem"> | string
+    description?: StringFilter<"EvtItem"> | string
+    price?: IntFilter<"EvtItem"> | number
+    startDate?: DateTimeFilter<"EvtItem"> | Date | string
+    endDate?: DateTimeFilter<"EvtItem"> | Date | string
+    location?: StringFilter<"EvtItem"> | string
+    category?: StringFilter<"EvtItem"> | string
+    availableSeats?: IntFilter<"EvtItem"> | number
+  }, "id">
+
+  export type EvtItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    location?: SortOrder
+    category?: SortOrder
+    availableSeats?: SortOrder
+    _count?: EvtItemCountOrderByAggregateInput
+    _avg?: EvtItemAvgOrderByAggregateInput
+    _max?: EvtItemMaxOrderByAggregateInput
+    _min?: EvtItemMinOrderByAggregateInput
+    _sum?: EvtItemSumOrderByAggregateInput
+  }
+
+  export type EvtItemScalarWhereWithAggregatesInput = {
+    AND?: EvtItemScalarWhereWithAggregatesInput | EvtItemScalarWhereWithAggregatesInput[]
+    OR?: EvtItemScalarWhereWithAggregatesInput[]
+    NOT?: EvtItemScalarWhereWithAggregatesInput | EvtItemScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"EvtItem"> | number
+    name?: StringWithAggregatesFilter<"EvtItem"> | string
+    description?: StringWithAggregatesFilter<"EvtItem"> | string
+    price?: IntWithAggregatesFilter<"EvtItem"> | number
+    startDate?: DateTimeWithAggregatesFilter<"EvtItem"> | Date | string
+    endDate?: DateTimeWithAggregatesFilter<"EvtItem"> | Date | string
+    location?: StringWithAggregatesFilter<"EvtItem"> | string
+    category?: StringWithAggregatesFilter<"EvtItem"> | string
+    availableSeats?: IntWithAggregatesFilter<"EvtItem"> | number
   }
 
   export type UserCreateInput = {
@@ -2263,6 +3546,87 @@ export namespace Prisma {
     referredBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EvtItemCreateInput = {
+    name: string
+    description: string
+    price: number
+    startDate: Date | string
+    endDate: Date | string
+    location: string
+    category: string
+    availableSeats: number
+  }
+
+  export type EvtItemUncheckedCreateInput = {
+    id?: number
+    name: string
+    description: string
+    price: number
+    startDate: Date | string
+    endDate: Date | string
+    location: string
+    category: string
+    availableSeats: number
+  }
+
+  export type EvtItemUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    location?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    availableSeats?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EvtItemUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    location?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    availableSeats?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EvtItemCreateManyInput = {
+    id?: number
+    name: string
+    description: string
+    price: number
+    startDate: Date | string
+    endDate: Date | string
+    location: string
+    category: string
+    availableSeats: number
+  }
+
+  export type EvtItemUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    location?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    availableSeats?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EvtItemUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    location?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    availableSeats?: IntFieldUpdateOperationsInput | number
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -2433,6 +3797,81 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type EvtItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    location?: SortOrder
+    category?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type EvtItemAvgOrderByAggregateInput = {
+    id?: SortOrder
+    price?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type EvtItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    location?: SortOrder
+    category?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type EvtItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    location?: SortOrder
+    category?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type EvtItemSumOrderByAggregateInput = {
+    id?: SortOrder
+    price?: SortOrder
+    availableSeats?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -2451,6 +3890,14 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -2590,6 +4037,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
 

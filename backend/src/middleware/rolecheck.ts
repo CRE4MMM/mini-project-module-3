@@ -12,7 +12,7 @@ export const protectWithRole = (allowedRoles: string[]): RequestHandler => {
         const authHeader = req.headers.authorization
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            res.status(401).json({ message: 'Unauthorized: No token provided' })
+            res.status(401).json({ message: 'Unauthorized' })
             return
         }
 

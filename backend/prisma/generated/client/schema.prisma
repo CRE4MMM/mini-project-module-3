@@ -33,3 +33,15 @@ enum Role {
   CUSTOMER
   ORGANIZER
 }
+
+model EvtItem {
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String
+  price          Int
+  startDate      DateTime
+  endDate        DateTime
+  location       String
+  category       String
+  availableSeats Int
+}
