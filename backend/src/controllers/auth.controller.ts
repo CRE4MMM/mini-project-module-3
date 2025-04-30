@@ -5,7 +5,8 @@ import { createToken } from "../utils/createToken";
 import { transporter } from "../configs/nodemailer";
 import { generateReferral } from "../utils/referralGen";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { decode } from "punycode";
 
 class AuthController {
     async registCust(req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -103,8 +104,8 @@ class AuthController {
             const decoded = jwt.verify(
                 token,
                 process.env.JWT_SECRET ||
-                '76c70af5e5c05dd1bde258fe53d97872cf4836116741fd512c5e57b5810df082'
-            ) as {id: string; email: string; role: string;}
+                'fallback'
+            ) as JwtPayload
 
             const user = await prisma.user.findUnique({
                 where: {id: decoded.id}
