@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { PrismaClient } from '../../prisma/generated/client'
 
 const prisma = new PrismaClient()
+
 export const createEvent = async (
     req: Request,
     res: Response
@@ -88,6 +89,27 @@ export const createEvent = async (
                 process.env.NODE_ENV === 'development'
                 ? (error as Error).message
                 : undefined,
+        })
+    }
+}
+
+export const getEvents = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const events = await prisma.evtItem.findMany()
+        res.status(200).json({
+        success: true,
+        message: 'Events fetched successfully',
+        data: events,
+        })
+    } catch (error) {
+        console.error('Error fetching events:', error)
+        res.status(500).json({
+        success: false,
+        message: 'Server error while fetching events',
+        error:
+            process.env.NODE_ENV === 'development'
+            ? (error as Error).message
+            : undefined,
         })
     }
 }
