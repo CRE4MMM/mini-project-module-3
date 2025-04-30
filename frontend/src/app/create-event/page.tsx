@@ -159,7 +159,7 @@ export default function CreateEventPage() {
 
         const API_URL =
             process.env.NEXT_PUBLIC_API_URL || 'https://mini-project-module-3.vercel.app'
-        const response = await fetch(`${API_URL}/api/events`, {
+        const response = await fetch(`${API_URL}/api/event/create-event`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

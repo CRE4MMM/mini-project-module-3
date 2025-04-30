@@ -26,7 +26,7 @@ class App {
         })
 
         this.app.use('/auth', authRouter)
-        this.app.use('api/event', eventRouter)
+        this.app.use('/api/event', eventRouter)
     }
 
     public start(): void {
