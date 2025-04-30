@@ -8,6 +8,7 @@ dotenv_1.default.config();
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const auth_router_1 = __importDefault(require("./routers/auth.router"));
+const event_router_1 = __importDefault(require("./routers/event.router"));
 const PORT = process.env.PORT || 9009;
 class App {
     constructor() {
@@ -24,6 +25,7 @@ class App {
             res.status(200).send('<h1>Test</h1>');
         });
         this.app.use('/auth', auth_router_1.default);
+        this.app.use('/api/event', event_router_1.default);
     }
     start() {
         this.app.listen(PORT, () => {
