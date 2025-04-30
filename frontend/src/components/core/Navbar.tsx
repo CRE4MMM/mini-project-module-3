@@ -24,6 +24,9 @@ export default function Navbar() {
                 <Link href="/events" className="text-gray-800 hover:text-blue-600">
                 Events
                 </Link>
+                <Link href="/create-event" className="text-gray-800 hover:text-blue-600">
+                Create Event
+                </Link>
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
