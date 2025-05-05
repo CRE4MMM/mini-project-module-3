@@ -92,7 +92,7 @@ export default function EventsPage() {
   const EventSkeleton = () => (
     <Card className="w-full h-full">
       <CardHeader className="pb-2">
-        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-32 w-full mb-2" />
         <Skeleton className="h-4 w-1/4" />
       </CardHeader>
       <CardContent className="pb-2">
@@ -140,7 +140,12 @@ export default function EventsPage() {
           {events.map((event) => (
             <Card key={event.id} className="h-full flex flex-col">
               <CardHeader>
-                <div className="flex justify-between items-start">
+                <img
+                  src="https://via.placeholder.com/300x200?text=Event+Image"
+                  alt={event.name}
+                  className="w-full h-32 object-cover rounded-t-lg"
+                />
+                <div className="flex justify-between items-start mt-2">
                   <CardTitle className="text-xl">{event.name}</CardTitle>
                   <Badge variant="secondary">{event.category}</Badge>
                 </div>
