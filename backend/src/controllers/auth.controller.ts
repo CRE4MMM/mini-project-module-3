@@ -4,7 +4,7 @@ import { hashPassword } from "../utils/hashPassword";
 import { generateReferral } from "../utils/referralGen";
 import { createToken } from "../utils/createToken";
 import bcrypt from 'bcrypt';
-import { verify, sign } from "jsonwebtoken";
+import { verify } from "jsonwebtoken";
 
 class AuthController {
     async signUp(req: Request, res: Response, next: NextFunction): Promise<any> {

@@ -4,6 +4,7 @@ import cors from 'cors'
 import express, { Request, Response, NextFunction, Application } from 'express'
 import authRouter from './routers/auth.router'
 import eventRouter from './routers/event.router'
+import transactionRouter from './routers/transaction.router'
 
 const PORT = process.env.PORT || 9009
 class App {
@@ -27,6 +28,7 @@ class App {
 
         this.app.use('/auth', authRouter)
         this.app.use('/api/event', eventRouter)
+        this.app.use('/api/transaction', transactionRouter)
     }
 
     public start(): void {
