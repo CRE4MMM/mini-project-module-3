@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { PrismaClient } from '../../prisma/generated/client';
-const prisma = new PrismaClient();
-export const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getEvents = exports.createEvent = void 0;
+const client_1 = require("../../prisma/generated/client");
+const prisma = new client_1.PrismaClient();
+const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, description, price, startDate, endDate, location, category, availableSeats, } = req.body;
         if (!name ||
@@ -78,7 +81,8 @@ export const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 });
-export const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createEvent = createEvent;
+const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const events = yield prisma.evtItem.findMany();
         res.status(200).json({
@@ -98,3 +102,4 @@ export const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
 });
+exports.getEvents = getEvents;

@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,8 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { genSalt, hash } from 'bcrypt';
-export const hashPassword = (password) => __awaiter(void 0, void 0, void 0, function* () {
-    const salt = yield genSalt(10);
-    return yield hash(password, salt);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hashPassword = void 0;
+const bcrypt_1 = require("bcrypt");
+const hashPassword = (password) => __awaiter(void 0, void 0, void 0, function* () {
+    const salt = yield (0, bcrypt_1.genSalt)(10);
+    return yield (0, bcrypt_1.hash)(password, salt);
 });
+exports.hashPassword = hashPassword;
