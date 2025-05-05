@@ -1,5 +1,5 @@
-import { nanoid } from 'nanoid';
+const { nanoid } = require('nanoid/non-secure');
 
 export const generateReferral = () => {
-    return `REF-${nanoid(8)}`;
+  return `REF-${nanoid(8)}`;
 };
