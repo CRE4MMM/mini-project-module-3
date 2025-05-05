@@ -34,7 +34,7 @@ export default function Navbar() {
                 href="/sign-in"
                 className="text-gray-800 hover:text-blue-600 font-medium"
                 >
-                Login
+                Sign In
                 </Link>
                 <Link
                 href="/sign-up"
