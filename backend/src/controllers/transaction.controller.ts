@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import prisma from '../configs/prisma'
+import jwt from 'jsonwebtoken'
 
 export class EventTransactionController {
   async createEventTransaction(req: Request, res: Response): Promise<any> {
@@ -9,6 +10,32 @@ export class EventTransactionController {
 
     if (isNaN(evtItemIdNum) || isNaN(quantityNum) || !userId) {
       return res.status(400).json({ error: 'Invalid input data' })
+    }
+
+    // Validate token
+    const token = req.headers.authorization?.replace('Bearer ', '')
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized: No token provided' })
+    }
+
+    try {
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'your-secret-key'
+      ) as { id: string }
+      if (userId !== decoded.id) {
+        return res.status(403).json({ error: 'Forbidden: User ID mismatch' })
+      }
+    } catch (error: any) {
+      if (
+        error.name === 'JsonWebTokenError' ||
+        error.name === 'TokenExpiredError'
+      ) {
+        return res
+          .status(401)
+          .json({ error: 'Unauthorized: Invalid or expired token' })
+      }
+      return res.status(500).json({ error: 'Failed to validate token' })
     }
 
     try {
@@ -42,7 +69,10 @@ export class EventTransactionController {
 
       res.status(201).json(transaction)
     } catch (error) {
-      res.status(500).json({ error: 'Failed to create event transaction' })
+      console.error('Error creating transaction:', error)
+      res.status(500).json({
+        error: 'Failed to create event transaction'
+      })
     }
   }
 

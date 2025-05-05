@@ -14,14 +14,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventTransactionController = void 0;
 const prisma_1 = __importDefault(require("../configs/prisma"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class EventTransactionController {
     createEventTransaction(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { userId, evtItemId, quantity } = req.body;
             const evtItemIdNum = parseInt(evtItemId);
             const quantityNum = parseInt(quantity);
             if (isNaN(evtItemIdNum) || isNaN(quantityNum) || !userId) {
                 return res.status(400).json({ error: 'Invalid input data' });
+            }
+            // Validate token
+            const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
+            if (!token) {
+                return res.status(401).json({ error: 'Unauthorized: No token provided' });
+            }
+            try {
+                const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+                if (userId !== decoded.id) {
+                    return res.status(403).json({ error: 'Forbidden: User ID mismatch' });
+                }
+            }
+            catch (error) {
+                if (error.name === 'JsonWebTokenError' ||
+                    error.name === 'TokenExpiredError') {
+                    return res
+                        .status(401)
+                        .json({ error: 'Unauthorized: Invalid or expired token' });
+                }
+                return res.status(500).json({ error: 'Failed to validate token' });
             }
             try {
                 const evtItem = yield prisma_1.default.evtItem.findUnique({
@@ -49,7 +71,10 @@ class EventTransactionController {
                 res.status(201).json(transaction);
             }
             catch (error) {
-                res.status(500).json({ error: 'Failed to create event transaction' });
+                console.error('Error creating transaction:', error);
+                res.status(500).json({
+                    error: 'Failed to create event transaction'
+                });
             }
         });
     }

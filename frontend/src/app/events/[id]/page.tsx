@@ -52,9 +52,11 @@ const EventDetailPage = () => {
           const errorText = await response.text()
           throw new Error(`Event not found: ${errorText || 'Unknown error'}`)
         }
-        const data = await response.json()
-        if (!data || !data.id) throw new Error('Invalid event data')
-        setEvent(data)
+        const result = await response.json()
+        if (!result.success || !result.data || !result.data.id) {
+          throw new Error('Invalid event data')
+        }
+        setEvent(result.data)
       } catch (err: any) {
         console.error('Fetch error:', err)
         setError(`Failed to load event details: ${err.message}`)
@@ -77,7 +79,10 @@ const EventDetailPage = () => {
     setLoading(true)
     setMessage(null)
     try {
-      const response = await fetch('/api/event-transactions', {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL ||
+        'https://mini-project-module-3.vercel.app'
+      const response = await fetch(`${API_URL}/api/transaction/event-transaction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,7 +104,6 @@ const EventDetailPage = () => {
         }. Total cost: Rp ${transaction.totalCost.toLocaleString()}`
       )
 
-      // Update available seats locally
       setEvent((prev) =>
         prev
           ? { ...prev, availableSeats: prev.availableSeats - quantity }
