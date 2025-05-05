@@ -17,7 +17,7 @@ const hashPassword_1 = require("../utils/hashPassword");
 const referralGen_1 = require("../utils/referralGen");
 const createToken_1 = require("../utils/createToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const nanoid_1 = require("nanoid");
+// import { nanoid } from 'nanoid';
 class AuthController {
     signUp(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -85,15 +85,15 @@ class AuthController {
                             },
                         });
                         // Generate a discount coupon for the new user (10% off, expires in 1 month)
-                        const couponCode = `DISC-${(0, nanoid_1.nanoid)(8)}`; // Generate a unique coupon code
-                        yield tx.coupon.create({
-                            data: {
-                                code: couponCode,
-                                userId: user.id,
-                                discount: 10, // 10% discount
-                                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
-                            },
-                        });
+                        // const couponCode = `DISC-${nanoid(8)}`; // Generate a unique coupon code
+                        // await tx.coupon.create({
+                        //     data: {
+                        //         code: couponCode,
+                        //         userId: user.id,
+                        //         discount: 10, // 10% discount
+                        //         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
+                        //     },
+                        // });
                     }
                     return user;
                 }));

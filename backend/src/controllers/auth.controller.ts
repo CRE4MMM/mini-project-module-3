@@ -4,7 +4,7 @@ import { hashPassword } from "../utils/hashPassword";
 import { generateReferral } from "../utils/referralGen";
 import { createToken } from "../utils/createToken";
 import bcrypt from 'bcrypt';
-import { nanoid } from 'nanoid';
+// import { nanoid } from 'nanoid';
 
 class AuthController {
     async signUp(req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -83,15 +83,15 @@ class AuthController {
                     });
 
                     // Generate a discount coupon for the new user (10% off, expires in 1 month)
-                    const couponCode = `DISC-${nanoid(8)}`; // Generate a unique coupon code
-                    await tx.coupon.create({
-                        data: {
-                            code: couponCode,
-                            userId: user.id,
-                            discount: 10, // 10% discount
-                            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
-                        },
-                    });
+                    // const couponCode = `DISC-${nanoid(8)}`; // Generate a unique coupon code
+                    // await tx.coupon.create({
+                    //     data: {
+                    //         code: couponCode,
+                    //         userId: user.id,
+                    //         discount: 10, // 10% discount
+                    //         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
+                    //     },
+                    // });
                 }
 
                 return user;
