@@ -17,16 +17,17 @@ const hashPassword_1 = require("../utils/hashPassword");
 const referralGen_1 = require("../utils/referralGen");
 const createToken_1 = require("../utils/createToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const nanoid_1 = require("nanoid");
 class AuthController {
     signUp(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { firstName, lastName, email, password, role, referredBy } = req.body;
                 if (!firstName || !lastName || !email || !password || !role) {
-                    return res.status(400).json({ message: 'all fields required' });
+                    return res.status(400).json({ message: 'All fields required' });
                 }
                 if (!['CUSTOMER', 'ORGANIZER'].includes(role)) {
-                    return res.status(400).json({ message: 'invalid role' });
+                    return res.status(400).json({ message: 'Invalid role' });
                 }
                 const isExist = yield prisma_1.prisma.user.findUnique({ where: { email } });
                 if (isExist) {
@@ -49,18 +50,55 @@ class AuthController {
                         });
                     }
                 }
-                const newUser = yield prisma_1.prisma.user.create({
-                    data: {
-                        firstName,
-                        lastName,
-                        email,
-                        password: hashedPassword,
-                        role,
-                        referralCode,
-                        referredBy: referredBy || null,
-                        isVerified: true,
-                    },
-                });
+                const REFERRAL_POINTS = 10000;
+                const newUser = yield prisma_1.prisma.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
+                    const user = yield tx.user.create({
+                        data: {
+                            firstName,
+                            lastName,
+                            email,
+                            password: hashedPassword,
+                            role,
+                            referralCode,
+                            referredBy: referredBy || null,
+                            isVerified: true,
+                            points: 0,
+                        },
+                    });
+                    if (referringUser) {
+                        yield tx.user.update({
+                            where: { id: referringUser.id },
+                            data: {
+                                points: { increment: REFERRAL_POINTS },
+                            },
+                        });
+                        yield tx.pointTransaction.create({
+                            data: {
+                                userId: referringUser.id,
+                                points: REFERRAL_POINTS,
+                                reason: "REFERRAL",
+                                expiresAt: new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000),
+                            },
+                        });
+                        const couponCode = `DISC-${(0, nanoid_1.nanoid)(8)}`;
+                        yield tx.coupon.create({
+                            data: {
+                                code: couponCode,
+                                userId: user.id,
+                                discount: 10,
+                                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                            },
+                        });
+                    }
+                    return user;
+                }));
+                let coupon = null;
+                if (referredBy && referringUser) {
+                    coupon = yield prisma_1.prisma.coupon.findFirst({
+                        where: { userId: newUser.id },
+                        orderBy: { createdAt: 'desc' },
+                    });
+                }
                 return res.status(201).send({
                     success: true,
                     message: 'Signup successful',
@@ -73,6 +111,8 @@ class AuthController {
                         referralCode: newUser.referralCode,
                         referredBy: newUser.referredBy,
                         isVerified: newUser.isVerified,
+                        points: newUser.points,
+                        coupon: coupon ? { code: coupon.code, discount: coupon.discount, expiresAt: coupon.expiresAt } : null,
                     },
                 });
             }
@@ -109,6 +149,13 @@ class AuthController {
                         message: "Invalid email or password",
                     });
                 }
+                const availablePoints = yield prisma_1.prisma.pointTransaction.aggregate({
+                    where: {
+                        userId: user.id,
+                        expiresAt: { gt: new Date() },
+                    },
+                    _sum: { points: true },
+                }).then(result => result._sum.points || 0);
                 const token = (0, createToken_1.createToken)({
                     id: user.id,
                     email: user.email,
@@ -125,6 +172,8 @@ class AuthController {
                             firstName: user.firstName,
                             lastName: user.lastName,
                             role: user.role,
+                            points: user.points,
+                            availablePoints: availablePoints,
                         },
                     },
                 });

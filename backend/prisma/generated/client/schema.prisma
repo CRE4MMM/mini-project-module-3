@@ -16,17 +16,20 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String             @id @default(cuid())
+  email        String             @unique
   password     String
   firstName    String
   lastName     String
-  isVerified   Boolean  @default(true)
-  role         Role     @default(CUSTOMER)
-  referralCode String   @unique
+  isVerified   Boolean            @default(true)
+  role         Role               @default(CUSTOMER)
+  referralCode String             @unique
   referredBy   String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  points       Int                @default(0)
+  transactions PointTransaction[]
+  coupons      Coupon[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 enum Role {
@@ -44,4 +47,24 @@ model EvtItem {
   location       String
   category       String
   availableSeats Int
+}
+
+model PointTransaction {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  points    Int // Positive for earned, negative for spent
+  reason    String // e.g., "REFERRAL", "DISCOUNT"
+  createdAt DateTime @default(now())
+  expiresAt DateTime // Expiration date for points
+}
+
+model Coupon {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  discount  Int // Discount amount (e.g., percentage)
+  expiresAt DateTime // Expiration date for the coupon
+  createdAt DateTime @default(now())
 }

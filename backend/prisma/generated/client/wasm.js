@@ -127,6 +127,7 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   referralCode: 'referralCode',
   referredBy: 'referredBy',
+  points: 'points',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -141,6 +142,24 @@ exports.Prisma.EvtItemScalarFieldEnum = {
   location: 'location',
   category: 'category',
   availableSeats: 'availableSeats'
+};
+
+exports.Prisma.PointTransactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  points: 'points',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+};
+
+exports.Prisma.CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  userId: 'userId',
+  discount: 'discount',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -164,7 +183,9 @@ exports.Role = exports.$Enums.Role = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  EvtItem: 'EvtItem'
+  EvtItem: 'EvtItem',
+  PointTransaction: 'PointTransaction',
+  Coupon: 'Coupon'
 };
 
 /**
