@@ -1,39 +1,45 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface EventItem {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  availableSeats: number;
-  location: string;
-  startDate: string;
-  endDate: string;
+  id: number
+  name: string
+  description: string
+  price: number
+  availableSeats: number
+  location: string
+  startDate: string
+  endDate: string
 }
 
 interface TransactionResponse {
-  id: number;
-  userId: string;
-  evtItemId: number;
-  quantity: number;
-  totalCost: number;
+  id: number
+  userId: string
+  evtItemId: number
+  quantity: number
+  totalCost: number
 }
 
 const EventDetailPage = () => {
-  const { id } = useParams();
-  const [event, setEvent] = useState<EventItem | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [userId] = useState<string>(''); 
+  const { id } = useParams()
+  const [event, setEvent] = useState<EventItem | null>(null)
+  const [quantity, setQuantity] = useState<number>(1)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+  const [userId] = useState<string>('user123')
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -41,25 +47,35 @@ const EventDetailPage = () => {
         const API_URL =
           process.env.NEXT_PUBLIC_API_URL ||
           'https://mini-project-module-3.vercel.app'
-        const response = await fetch(`${API_URL}/api/event/${id}`);
-        if (!response.ok) throw new Error('Event not found');
-        const data = await response.json();
-        setEvent(data);
-      } catch (err) {
-        setError('Failed to load event details');
+        const response = await fetch(`${API_URL}/api/event/${id}`)
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`Event not found: ${errorText || 'Unknown error'}`)
+        }
+        const data = await response.json()
+        if (!data || !data.id) throw new Error('Invalid event data')
+        setEvent(data)
+      } catch (err: any) {
+        console.error('Fetch error:', err)
+        setError(`Failed to load event details: ${err.message}`)
       }
-    };
-    fetchEvent();
-  }, [id]);
+    }
+    fetchEvent()
+  }, [id])
 
   const handleBookEvent = async () => {
     if (!event || quantity < 1 || quantity > event.availableSeats) {
-      setMessage('Invalid quantity: Please select a valid number of seats.');
-      return;
+      setMessage('Invalid quantity: Please select a valid number of seats.')
+      return
     }
 
-    setLoading(true);
-    setMessage(null);
+    if (!userId) {
+      setMessage('User ID is required to book an event.')
+      return
+    }
+
+    setLoading(true)
+    setMessage(null)
     try {
       const response = await fetch('/api/event-transactions', {
         method: 'POST',
@@ -69,32 +85,40 @@ const EventDetailPage = () => {
           evtItemId: event.id,
           quantity,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to book event');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to book event')
       }
 
-      const transaction: TransactionResponse = await response.json();
-      setMessage(`Booking Successful! You have booked ${quantity} seat(s) for ${event.name}. Total cost: Rp ${transaction.totalCost.toLocaleString()}`);
+      const transaction: TransactionResponse = await response.json()
+      setMessage(
+        `Booking Successful! You have booked ${quantity} seat(s) for ${
+          event.name
+        }. Total cost: Rp ${transaction.totalCost.toLocaleString()}`
+      )
 
       // Update available seats locally
-      setEvent((prev) => prev ? { ...prev, availableSeats: prev.availableSeats - quantity } : null);
-      setQuantity(1);
+      setEvent((prev) =>
+        prev
+          ? { ...prev, availableSeats: prev.availableSeats - quantity }
+          : null
+      )
+      setQuantity(1)
     } catch (err: any) {
-      setMessage(`Booking Failed: ${err.message}`);
+      setMessage(`Booking Failed: ${err.message}`)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (error) {
-    return <div className="text-center text-red-500">{error}</div>;
+    return <div className="text-center text-red-500">{error}</div>
   }
 
   if (!event) {
-    return <div className="text-center">Loading...</div>;
+    return <div className="text-center">Loading...</div>
   }
 
   return (
@@ -108,13 +132,16 @@ const EventDetailPage = () => {
           <p className="text-gray-700 mb-4">{event.description}</p>
           <p className="text-sm text-gray-600">
             <span className="font-semibold">Date:</span>{' '}
-            {new Date(event.startDate).toLocaleString()} - {new Date(event.endDate).toLocaleString()}
+            {new Date(event.startDate).toLocaleString()} -{' '}
+            {new Date(event.endDate).toLocaleString()}
           </p>
           <p className="text-sm text-gray-600">
-            <span className="font-semibold">Price:</span> Rp {event.price.toLocaleString()}
+            <span className="font-semibold">Price:</span> Rp{' '}
+            {event.price.toLocaleString()}
           </p>
           <p className="text-sm text-gray-600">
-            <span className="font-semibold">Available Seats:</span> {event.availableSeats}
+            <span className="font-semibold">Available Seats:</span>{' '}
+            {event.availableSeats}
           </p>
 
           <div className="mt-6">
@@ -125,13 +152,21 @@ const EventDetailPage = () => {
               min="1"
               max={event.availableSeats}
               value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              onChange={(e) =>
+                setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+              }
               className="mt-1"
             />
           </div>
 
           {message && (
-            <div className={`mt-4 p-2 rounded ${message.includes('Failed') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <div
+              className={`mt-4 p-2 rounded ${
+                message.includes('Failed')
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-green-100 text-green-700'
+              }`}
+            >
               {message}
             </div>
           )}
@@ -147,7 +182,7 @@ const EventDetailPage = () => {
         </CardFooter>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default EventDetailPage;
+export default EventDetailPage

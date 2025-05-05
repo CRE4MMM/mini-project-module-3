@@ -7,5 +7,6 @@ const express_1 = __importDefault(require("express"));
 const event_controller_1 = require("../controllers/event.controller");
 const router = express_1.default.Router();
 router.get('/', event_controller_1.getEvents);
+router.get('/:id', event_controller_1.getEventById);
 router.post('/create-event', event_controller_1.createEvent);
 exports.default = router;

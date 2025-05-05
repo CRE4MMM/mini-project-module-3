@@ -115,10 +115,23 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
 }
 
 export const getEventById = async (req: Request, res: Response): Promise<any> => {
-  const { id } = req.params;
-  const event = await prisma.evtItem.findUnique({ where: { id: Number(id) } });
-  if (!event) {
-    return res.status(404).json({ error: 'Event not found' });
+  try {
+    const { id } = req.params;
+    const eventId = Number(id);
+    if (isNaN(eventId)) {
+      return res.status(400).json({ success: false, message: 'Invalid event ID' });
+    }
+    const event = await prisma.evtItem.findUnique({ where: { id: eventId } });
+    if (!event) {
+      return res.status(404).json({ success: false, message: 'Event not found' });
+    }
+    res.status(200).json({ success: true, data: event });
+  } catch (error) {
+    console.error('Error fetching event by ID:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching event',
+      error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+    });
   }
-  res.json(event);
 };

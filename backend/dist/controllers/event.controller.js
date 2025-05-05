@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEvents = exports.createEvent = void 0;
+exports.getEventById = exports.getEvents = exports.createEvent = void 0;
 const client_1 = require("../../prisma/generated/client");
 const prisma = new client_1.PrismaClient();
 const createEvent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -103,3 +103,26 @@ const getEvents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getEvents = getEvents;
+const getEventById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const eventId = Number(id);
+        if (isNaN(eventId)) {
+            return res.status(400).json({ success: false, message: 'Invalid event ID' });
+        }
+        const event = yield prisma.evtItem.findUnique({ where: { id: eventId } });
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'Event not found' });
+        }
+        res.status(200).json({ success: true, data: event });
+    }
+    catch (error) {
+        console.error('Error fetching event by ID:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching event',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+});
+exports.getEventById = getEventById;
