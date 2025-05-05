@@ -1,3 +1,5 @@
-export const generateReferral = (): string => {
-    return Math.random().toString(36).substring(2, 10)
-}
+import { nanoid } from 'nanoid';
+
+export const generateReferral = () => {
+    return `REF-${nanoid(8)}`;
+};
