@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext' // ✅ Import AuthContext
 
 interface SignInData {
   email: string
@@ -30,12 +31,13 @@ interface AlertMessage {
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [alert, setAlert] = useState<AlertMessage | null>(null)
-  const router = useRouter()
-
   const [signInData, setSignInData] = useState<SignInData>({
     email: '',
     password: '',
   })
+
+  const router = useRouter()
+  const { signIn } = useAuth() // ✅ Use AuthContext
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,6 +48,7 @@ export default function SignInPage() {
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL ||
         'https://mini-project-module-3.vercel.app'
+
       const response = await fetch(`${API_URL}/auth/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,7 +61,7 @@ export default function SignInPage() {
         throw new Error(data.message || 'Sign in failed')
       }
 
-      localStorage.setItem('token', data.data.token)
+      signIn(data.data.token, data.data.user)
 
       setAlert({
         type: 'success',
@@ -68,7 +71,7 @@ export default function SignInPage() {
 
       setSignInData({ email: '', password: '' })
 
-      setTimeout(() => router.push('/dashboard'), 1000)
+      setTimeout(() => router.push('/dashboard-customer'), 1000)
     } catch (error: any) {
       setAlert({
         type: 'error',
@@ -129,14 +132,14 @@ export default function SignInPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between flex-col sm:flex-row gap-2">
           <p className="text-sm text-muted-foreground">
-            Dont have an account?{' '}
+            Don’t have an account?{' '}
             <Link href="/auth/signup" className="text-primary hover:underline">
               Sign Up
             </Link>
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-center sm:text-right">
             By signing in, you agree to our Terms of Service and Privacy Policy.
           </p>
         </CardFooter>

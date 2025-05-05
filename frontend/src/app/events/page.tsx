@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CalendarIcon, MapPinIcon } from 'lucide-react'
+import Image from 'next/image'
 
 interface Event {
   id: string
@@ -140,10 +141,12 @@ export default function EventsPage() {
           {events.map((event) => (
             <Card key={event.id} className="h-full flex flex-col">
               <CardHeader>
-                <img
+                <Image
                   src="https://via.placeholder.com/300x200?text=Event+Image"
                   alt={event.name}
                   className="w-full h-32 object-cover rounded-t-lg"
+                  width={300}
+                  height={300}
                 />
                 <div className="flex justify-between items-start mt-2">
                   <CardTitle className="text-xl">{event.name}</CardTitle>
