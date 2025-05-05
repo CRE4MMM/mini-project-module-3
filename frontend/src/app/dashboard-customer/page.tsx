@@ -2,13 +2,24 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import { debounce } from 'lodash'
-import Footer from '../../components/core/Footer'
-import EventCard from '../../components/ui/EventCard'
+import { useRouter } from 'next/navigation'
+import { CalendarIcon, MapPinIcon } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import SearchBar from '../../components/ui/SearchBar'
 import CategoryFilter from '../../components/ui/CategoryFilter'
+import Footer from '../../components/core/Footer'
 
-export interface EventItem {
-    id: number
+interface Event {
+    id: string
     name: string
     description: string
     price: number
@@ -19,101 +30,115 @@ export interface EventItem {
     availableSeats: number
 }
 
-const MOCK_EVENTS: EventItem[] = [
-    {
-        id: 1,
-        name: 'Tech Conference 2025',
-        description: 'Annual tech conference featuring the latest innovations',
-        price: 300000,
-        startDate: '2025-05-15T09:00:00',
-        endDate: '2025-05-17T18:00:00',
-        location: 'Jakarta Convention Center',
-        category: 'Technology',
-        availableSeats: 500,
-    },
-    {
-        id: 2,
-        name: 'Music Festival',
-        description: 'A weekend of amazing music performances',
-        price: 450000,
-        startDate: '2025-06-10T14:00:00',
-        endDate: '2025-06-12T23:00:00',
-        location: 'Bali Beach Resort',
-        category: 'Music',
-        availableSeats: 2000,
-    },
-    {
-        id: 3,
-        name: 'Food & Culinary Expo',
-        description: 'Explore culinary delights from around the world',
-        price: 150000,
-        startDate: '2025-04-20T10:00:00',
-        endDate: '2025-04-22T20:00:00',
-        location: 'Bandung Exhibition Center',
-        category: 'Food',
-        availableSeats: 1200,
-    },
-    {
-        id: 4,
-        name: 'Business Leadership Summit',
-        description: 'Learn from top business leaders',
-        price: 750000,
-        startDate: '2025-07-05T08:00:00',
-        endDate: '2025-07-06T17:00:00',
-        location: 'Grand Hyatt Jakarta',
-        category: 'Business',
-        availableSeats: 300,
-    },
-    {
-        id: 5,
-        name: 'Charity Run',
-        description: 'Run for a cause and help raise funds',
-        price: 0,
-        startDate: '2025-05-30T06:00:00',
-        endDate: '2025-05-30T11:00:00',
-        location: 'Senayan City Park',
-        category: 'Sports',
-        availableSeats: 5000,
-    },
-    {
-        id: 6,
-        name: 'Summer Tech Expo',
-        description: 'Explore the latest in tech innovation and gadgets',
-        price: 250000,
-        startDate: '2025-06-15T09:00:00',
-        endDate: '2025-06-15T18:00:00',
-        location: 'Downtown Convention Center',
-        category: 'Technology',
-        availableSeats: 1200,
-    },
-]
-
-const categories: string[] = [
-    'All',
-    'Technology',
-    'Music',
-    'Food',
-    'Business',
-    'Sports',
-]
-const locations: string[] = [
-    'All', 
-    'Jakarta', 
-    'Bali', 
-    'Bandung'
-]
-
 const Home: React.FC = () => {
-    const [events, setEvents] = useState<EventItem[]>([])
-    const [filteredEvents, setFilteredEvents] = useState<EventItem[]>([])
+    const [events, setEvents] = useState<Event[]>([])
+    const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
     const [searchTerm, setSearchTerm] = useState<string>('')
     const [selectedCategory, setSelectedCategory] = useState<string>('All')
     const [selectedLocation, setSelectedLocation] = useState<string>('All')
 
+    const [categories, setCategories] = useState<string[]>(['All'])
+    const [locations, setLocations] = useState<string[]>(['All'])
+
+    const router = useRouter()    
+
     useEffect(() => {
-        setEvents(MOCK_EVENTS)
-        setFilteredEvents(MOCK_EVENTS)
+        const fetchEvents = async () => {
+        try {
+            const response = await fetch(
+            'https://mini-project-module-3.vercel.app/api/event'
+            )
+
+            if (!response.ok) {
+            throw new Error(
+                `Error: ${response.status} - The API endpoint might not exist or is not accessible`
+            )
+            }
+
+            const result = await response.json()
+
+            if (result.success) {
+            const sortedEvents = [...result.data].sort((a, b) => {
+                if (a.createdAt && b.createdAt) {
+                return (
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
+                )
+                }
+                if (!isNaN(Number(a.id)) && !isNaN(Number(b.id))) {
+                return Number(b.id) - Number(a.id)
+                }
+                return (
+                new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+                )
+            })
+
+            setEvents(sortedEvents)
+            setFilteredEvents(sortedEvents)
+            setCategories([
+                'All',
+                ...new Set(sortedEvents.map((event) => event.category)),
+            ])
+            setLocations([
+                'All',
+                ...new Set(
+                sortedEvents.map((event) => event.location.split(' ')[0])
+                ),
+            ])
+            } else {
+            setError(result.message || 'Failed to fetch events')
+            }
+        } catch (err) {
+            console.error('Error fetching events:', err)
+            setError(
+            err instanceof Error ? err.message : 'An unknown error occurred'
+            )
+        } finally {
+            setLoading(false)
+        }
+        }
+
+        fetchEvents()
     }, [])
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString)
+        return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        })
+    }
+
+    const EventSkeleton = () => (
+        <Card className="w-full h-full">
+        <CardHeader className="pb-2">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/4" />
+        </CardHeader>
+        <CardContent className="pb-2">
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-3/4 mb-4" />
+            <div className="flex items-center gap-2 mb-2">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-1/3" />
+            </div>
+            <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-2/3" />
+            </div>
+        </CardContent>
+        <CardFooter className="flex justify-between border-t pt-4">
+            <Skeleton className="h-5 w-1/4" />
+            <Skeleton className="h-5 w-1/4" />
+        </CardFooter>
+        </Card>
+    )
 
     useEffect(() => {
         const filtered = events.filter((evt) => {
@@ -137,10 +162,14 @@ const Home: React.FC = () => {
         setSearchTerm(value)
     }, 1000)
 
+    const handleSeeAll = () => {
+        router.push('/events')
+    }
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col min-h-screen">
         <Head>
-            <title>EventHub - Discover Amazing Events</title>
+            <title>Discover Amazing Events</title>
             <meta
             name="description"
             content="Find and book the best events in your area"
@@ -148,61 +177,112 @@ const Home: React.FC = () => {
             <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <main className="container mx-auto px-4 py-8">
-            <section className="mb-12 text-center">
-            <h1 className="text-4xl text-black font-bold mb-4">
-                Discover Amazing Events
+        <main className="flex-grow container py-8 mx-auto">
+            <h1 className="text-3xl font-bold tracking-tight mb-4 text-center">
+            Discover Amazing Events
             </h1>
-            <p className="text-lg text-black mb-8">
-                Find and book tickets for the best events around you
+            <p className="text-center text-lg text-gray-600 mb-8">
+            Welcome to EventHub, your gateway to unforgettable experiences! Explore a diverse range of events, from thrilling concerts to insightful workshops, and book your spot today. Join a vibrant community and create lasting memories!
             </p>
 
-            <div className="max-w-3xl mx-auto">
-                <SearchBar onSearch={handleSearch} />
+            <div className="max-w-3xl mx-auto mb-8">
+            <SearchBar onSearch={handleSearch} />
             </div>
-            </section>
 
-            <section className="mb-12">
             <div className="flex flex-wrap gap-4 mb-8">
-                <CategoryFilter
+            <CategoryFilter
                 categories={categories}
                 selectedCategory={selectedCategory}
                 onSelect={setSelectedCategory}
-                />
+            />
 
-                <div className="ml-auto">
+            <div className="ml-auto">
                 <select
-                    className="bg-blue-600 text-white border border-blue-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 hover:bg-blue-700 transition duration-200 appearance-none cursor-pointer"
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
+                className="bg-blue-600 text-white border border-blue-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 hover:bg-blue-700 transition duration-200 appearance-none cursor-pointer"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
                 >
-                    {locations.map((location) => (
+                {locations.map((location) => (
                     <option
-                        key={location}
-                        value={location}
-                        className="bg-blue-800 text-white"
+                    key={location}
+                    value={location}
+                    className="bg-blue-800 text-white"
                     >
-                        {location}
+                    {location}
                     </option>
-                    ))}
+                ))}
                 </select>
-                </div>
+            </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredEvents.length > 0 ? (
-                filteredEvents.map((evt) => (
-                    <EventCard key={evt.id} event={evt} />
-                ))
-                ) : (
-                <div className="col-span-full text-center py-12">
-                    <p className="text-xl text-gray-500">
-                    No events found matching your criteria
-                    </p>
+            {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, index) => (
+                <EventSkeleton key={index} />
+                ))}
+            </div>
+            ) : error ? (
+            <div className="bg-destructive/10 border-l-4 border-destructive p-4 rounded">
+                <p className="text-destructive">{error}</p>
+            </div>
+            ) : filteredEvents.length === 0 ? (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded">
+                <p>No events found matching your criteria</p>
+            </div>
+            ) : (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEvents.slice(0, 3).map((event) => (
+                    <Card key={event.id} className="h-full flex flex-col">
+                    <CardHeader>
+                        <div className="flex justify-between items-start">
+                        <CardTitle className="text-xl">{event.name}</CardTitle>
+                        <Badge variant="secondary">{event.category}</Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                        <p className="text-muted-foreground mb-4 line-clamp-3">
+                        {event.description}
+                        </p>
+
+                        <div className="flex items-center text-muted-foreground mb-2">
+                        <MapPinIcon className="w-4 h-4 mr-2" />
+                        <span className="text-sm">{event.location}</span>
+                        </div>
+
+                        <div className="flex items-center text-muted-foreground">
+                        <CalendarIcon className="w-4 h-4 mr-2" />
+                        <span className="text-sm">
+                            {formatDate(event.startDate)} -{' '}
+                            {formatDate(event.endDate)}
+                        </span>
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className="flex justify-between border-t pt-4">
+                        <div className="text-green-600 font-bold">
+                        Rp {event.price.toLocaleString('id-ID')}
+                        </div>
+                        <div className="text-muted-foreground text-sm">
+                        {event.availableSeats} seats available
+                        </div>
+                    </CardFooter>
+
+                    <div className="px-6 pb-6">
+                        <Button className="w-full">Book Now</Button>
+                    </div>
+                    </Card>
+                ))}
+                </div>
+                {filteredEvents.length > 3 && (
+                <div className="text-center mt-6">
+                    <Button onClick={handleSeeAll} variant="outline">
+                    See All
+                    </Button>
                 </div>
                 )}
-            </div>
-            </section>
+            </>
+            )}
         </main>
 
         <Footer />
