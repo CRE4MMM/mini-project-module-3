@@ -17,7 +17,6 @@ const hashPassword_1 = require("../utils/hashPassword");
 const referralGen_1 = require("../utils/referralGen");
 const createToken_1 = require("../utils/createToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-// import { nanoid } from 'nanoid';
 class AuthController {
     signUp(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +32,7 @@ class AuthController {
                 if (isExist) {
                     return res.status(400).send({
                         success: false,
-                        message: `${email} is already in use, please use another email`,
+                        message: `${email} is already in use, please use another email`
                     });
                 }
                 const hashedPassword = yield (0, hashPassword_1.hashPassword)(password);
@@ -41,18 +40,18 @@ class AuthController {
                 let referringUser = null;
                 if (referredBy) {
                     referringUser = yield prisma_1.prisma.user.findUnique({
-                        where: { referralCode: referredBy },
+                        where: { referralCode: referredBy }
                     });
                     if (!referringUser) {
                         return res.status(400).send({
                             success: false,
-                            message: "Invalid referral code",
+                            message: "Invalid referral code"
                         });
                     }
                 }
                 // Define points for referral (10,000 points per successful referral)
                 const REFERRAL_POINTS = 10000;
-                // Create new user, update referring user's points, create a transaction, and generate a coupon in a single transaction
+                // Create new user, update referring user's points, and create a transaction in a single transaction
                 const newUser = yield prisma_1.prisma.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
                     // Create the new user
                     const user = yield tx.user.create({
@@ -84,27 +83,9 @@ class AuthController {
                                 expiresAt: new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000), // 3 months from now
                             },
                         });
-                        // Generate a discount coupon for the new user (10% off, expires in 1 month)
-                        // const couponCode = `DISC-${nanoid(8)}`; // Generate a unique coupon code
-                        // await tx.coupon.create({
-                        //     data: {
-                        //         code: couponCode,
-                        //         userId: user.id,
-                        //         discount: 10, // 10% discount
-                        //         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
-                        //     },
-                        // });
                     }
                     return user;
                 }));
-                // Fetch the coupon for the response (if created)
-                let coupon = null;
-                if (referredBy && referringUser) {
-                    coupon = yield prisma_1.prisma.coupon.findFirst({
-                        where: { userId: newUser.id },
-                        orderBy: { createdAt: 'desc' },
-                    });
-                }
                 return res.status(201).send({
                     success: true,
                     message: 'Signup successful',
@@ -118,7 +99,6 @@ class AuthController {
                         referredBy: newUser.referredBy,
                         isVerified: newUser.isVerified,
                         points: newUser.points,
-                        coupon: coupon ? { code: coupon.code, discount: coupon.discount, expiresAt: coupon.expiresAt } : null,
                     },
                 });
             }

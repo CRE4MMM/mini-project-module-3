@@ -3,43 +3,42 @@ import { prisma } from "../configs/prisma";
 import { hashPassword } from "../utils/hashPassword";
 import { generateReferral } from "../utils/referralGen";
 import { createToken } from "../utils/createToken";
-import bcrypt from 'bcrypt';
-// import { nanoid } from 'nanoid';
+import bcrypt from 'bcrypt'
 
 class AuthController {
     async signUp(req: Request, res: Response, next: NextFunction): Promise<any> {
         try {
-            const { firstName, lastName, email, password, role, referredBy } = req.body;
+            const { firstName, lastName, email, password, role, referredBy } = req.body
 
             if (!firstName || !lastName || !email || !password || !role) {
-                return res.status(400).json({ message: 'All fields required' });
+                return res.status(400).json({ message: 'All fields required' })
             }
 
             if (!['CUSTOMER', 'ORGANIZER'].includes(role)) {
-                return res.status(400).json({ message: 'Invalid role' });
+                return res.status(400).json({ message: 'Invalid role' })
             }
 
-            const isExist = await prisma.user.findUnique({ where: { email } });
+            const isExist = await prisma.user.findUnique({ where: { email } })
             if (isExist) {
                 return res.status(400).send({
                     success: false,
-                    message: `${email} is already in use, please use another email`,
-                });
+                    message: `${email} is already in use, please use another email`
+                })
             }
 
-            const hashedPassword = await hashPassword(password);
-            const referralCode = generateReferral();
+            const hashedPassword = await hashPassword(password)
+            const referralCode = generateReferral()
 
             let referringUser = null;
             if (referredBy) {
                 referringUser = await prisma.user.findUnique({
-                    where: { referralCode: referredBy },
+                    where: { referralCode: referredBy }
                 });
 
                 if (!referringUser) {
                     return res.status(400).send({
                         success: false,
-                        message: "Invalid referral code",
+                        message: "Invalid referral code"
                     });
                 }
             }
@@ -47,7 +46,7 @@ class AuthController {
             // Define points for referral (10,000 points per successful referral)
             const REFERRAL_POINTS = 10000;
 
-            // Create new user, update referring user's points, create a transaction, and generate a coupon in a single transaction
+            // Create new user, update referring user's points, and create a transaction in a single transaction
             const newUser = await prisma.$transaction(async (tx) => {
                 // Create the new user
                 const user = await tx.user.create({
@@ -81,30 +80,10 @@ class AuthController {
                             expiresAt: new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000), // 3 months from now
                         },
                     });
-
-                    // Generate a discount coupon for the new user (10% off, expires in 1 month)
-                    // const couponCode = `DISC-${nanoid(8)}`; // Generate a unique coupon code
-                    // await tx.coupon.create({
-                    //     data: {
-                    //         code: couponCode,
-                    //         userId: user.id,
-                    //         discount: 10, // 10% discount
-                    //         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 1 month from now
-                    //     },
-                    // });
                 }
 
                 return user;
             });
-
-            // Fetch the coupon for the response (if created)
-            let coupon = null;
-            if (referredBy && referringUser) {
-                coupon = await prisma.coupon.findFirst({
-                    where: { userId: newUser.id },
-                    orderBy: { createdAt: 'desc' },
-                });
-            }
 
             return res.status(201).send({
                 success: true,
@@ -119,7 +98,6 @@ class AuthController {
                     referredBy: newUser.referredBy,
                     isVerified: newUser.isVerified,
                     points: newUser.points,
-                    coupon: coupon ? { code: coupon.code, discount: coupon.discount, expiresAt: coupon.expiresAt } : null,
                 },
             });
         } catch (error) {
