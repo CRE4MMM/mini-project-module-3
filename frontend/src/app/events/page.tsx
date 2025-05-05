@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Card,
   CardContent,
@@ -30,6 +31,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -181,7 +183,12 @@ export default function EventsPage() {
               </CardFooter>
 
               <div className="px-6 pb-6">
-                <Button className="w-full">Book Now</Button>
+                <Button
+                  className="w-full"
+                  onClick={() => router.push(`/events/${event.id}`)}
+                >
+                  Book Now
+                </Button>
               </div>
             </Card>
           ))}
