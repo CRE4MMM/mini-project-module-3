@@ -81,7 +81,7 @@ export default function SignUpPage() {
         referredBy: '',
       })
 
-      setTimeout(() => router.push(`/auth/signin`), 1000)
+      setTimeout(() => router.push(`/sign-in`), 1000)
     } catch (error: any) {
       setAlert({
         type: 'error',
