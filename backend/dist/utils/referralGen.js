@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateReferral = void 0;
-const generateReferral = () => {
-    return Math.random().toString(36).substring(2, 10);
+import { nanoid } from 'nanoid';
+export const generateReferral = () => {
+    return `REF-${nanoid(8)}`;
 };
-exports.generateReferral = generateReferral;

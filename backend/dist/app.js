@@ -1,31 +1,26 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const cors_1 = __importDefault(require("cors"));
-const express_1 = __importDefault(require("express"));
-const auth_router_1 = __importDefault(require("./routers/auth.router"));
-const event_router_1 = __importDefault(require("./routers/event.router"));
+import dotenv from 'dotenv';
+dotenv.config();
+import cors from 'cors';
+import express from 'express';
+import authRouter from './routers/auth.router';
+import eventRouter from './routers/event.router';
 const PORT = process.env.PORT || 9009;
 class App {
     constructor() {
-        this.app = (0, express_1.default)();
+        this.app = express();
         this.configure();
         this.route();
     }
     configure() {
-        this.app.use((0, cors_1.default)());
-        this.app.use(express_1.default.json());
+        this.app.use(cors());
+        this.app.use(express.json());
     }
     route() {
         this.app.get('/', (req, res) => {
             res.status(200).send('<h1>Test</h1>');
         });
-        this.app.use('/auth', auth_router_1.default);
-        this.app.use('/api/event', event_router_1.default);
+        this.app.use('/auth', authRouter);
+        this.app.use('/api/event', eventRouter);
     }
     start() {
         this.app.listen(PORT, () => {
@@ -33,4 +28,4 @@ class App {
         });
     }
 }
-exports.default = App;
+export default App;
