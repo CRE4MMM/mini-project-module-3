@@ -17,6 +17,7 @@ const hashPassword_1 = require("../utils/hashPassword");
 const referralGen_1 = require("../utils/referralGen");
 const createToken_1 = require("../utils/createToken");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = require("jsonwebtoken");
 class AuthController {
     signUp(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -170,6 +171,77 @@ class AuthController {
                 return res.status(500).json({
                     success: false,
                     message: "Server error during sign-in",
+                });
+            }
+        });
+    }
+    keepSignIn(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // Assuming "Bearer <token>"
+                if (!token) {
+                    return res.status(401).json({
+                        success: false,
+                        message: "No token provided",
+                    });
+                }
+                // Verify token using jsonwebtoken
+                let decoded;
+                try {
+                    decoded = (0, jsonwebtoken_1.verify)(token, process.env.JWT_SECRET || "fallback");
+                }
+                catch (err) {
+                    return res.status(401).json({
+                        success: false,
+                        message: "Invalid or expired token",
+                    });
+                }
+                const user = yield prisma_1.prisma.user.findUnique({
+                    where: { id: decoded.id },
+                });
+                if (!user || !user.isVerified) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "User not found or not verified",
+                    });
+                }
+                // Calculate available points (sum of non-expired transactions)
+                const availablePoints = yield prisma_1.prisma.pointTransaction.aggregate({
+                    where: {
+                        userId: user.id,
+                        expiresAt: { gt: new Date() },
+                    },
+                    _sum: { points: true },
+                }).then(result => result._sum.points || 0);
+                // Generate a new token to refresh the session
+                const newToken = (0, createToken_1.createToken)({
+                    id: user.id,
+                    email: user.email,
+                    role: user.role,
+                });
+                return res.status(200).json({
+                    success: true,
+                    message: "Session refreshed",
+                    data: {
+                        token: newToken,
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            role: user.role,
+                            points: user.points,
+                            availablePoints: availablePoints,
+                        },
+                    },
+                });
+            }
+            catch (error) {
+                console.error(error);
+                return res.status(500).json({
+                    success: false,
+                    message: "Server error during session refresh",
                 });
             }
         });
