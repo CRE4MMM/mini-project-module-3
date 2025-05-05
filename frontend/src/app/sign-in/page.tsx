@@ -2,159 +2,145 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { AlertCircle } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import Link from 'next/link'
+
+interface SignInData {
+  email: string
+  password: string
+}
+
+interface AlertMessage {
+  type: 'success' | 'error'
+  title: string
+  message: string
+}
 
 export default function SignInPage() {
-    const router = useRouter()
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState('')
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    })
+  const [isLoading, setIsLoading] = useState(false)
+  const [alert, setAlert] = useState<AlertMessage | null>(null)
+  const router = useRouter()
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
-        setError('')
+  const [signInData, setSignInData] = useState<SignInData>({
+    email: '',
+    password: '',
+  })
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setAlert(null)
+
+    try {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL ||
+        'https://mini-project-module-3.vercel.app'
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signInData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Sign in failed')
+      }
+
+      localStorage.setItem('token', data.data.token)
+
+      setAlert({
+        type: 'success',
+        title: 'Success',
+        message: 'Signed in successfully!',
+      })
+
+      setSignInData({ email: '', password: '' })
+
+      setTimeout(() => router.push('/dashboard'), 1000)
+    } catch (error: any) {
+      setAlert({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to sign in',
+      })
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError('')
-
-        if (!formData.email || !formData.password) {
-        setError('Email and password are required')
-        setIsLoading(false)
-        return
-        }
-
-        try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/signin`,
-            {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: formData.email,
-                password: formData.password,
-            }),
-            }
-        )
-
-        const data = await response.json()
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to sign in')
-        }
-
-        localStorage.setItem('token', data.data.token)
-        localStorage.setItem('user', JSON.stringify(data.data.user))
-
-        if (data.data.user.role === 'CUSTOMER') {
-            router.push('/dashboard-customer')
-        } else if (data.data.user.role === 'ORGANIZER') {
-            router.push('/dashboard-organizer')
-        }
-        } catch (err) {
-        setError(
-            err instanceof Error ? err.message : 'An error occurred during sign in'
-        )
-        } finally {
-        setIsLoading(false)
-        }
-    }
-
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md space-y-8">
-            <div className="text-center">
-            <h1 className="text-3xl font-bold">Welcome back</h1>
-            <p className="mt-2 text-gray-600">Sign in to your account</p>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Sign In</CardTitle>
+          <CardDescription>
+            Enter your credentials to access your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {alert && (
+            <Alert
+              variant={alert.type === 'error' ? 'destructive' : 'default'}
+              className="mb-4"
+            >
+              <AlertTitle>{alert.title}</AlertTitle>
+              <AlertDescription>{alert.message}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="signin-email">Email</Label>
+              <Input
+                id="signin-email"
+                type="email"
+                value={signInData.email}
+                onChange={(e) =>
+                  setSignInData({ ...signInData, email: e.target.value })
+                }
+                required
+              />
             </div>
-
-            <Card>
-            <CardHeader>
-                <CardTitle>Sign In</CardTitle>
-            </CardHeader>
-            <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                {error && (
-                    <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
-
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                        href="/forgot-password"
-                        className="text-sm text-blue-600 hover:text-blue-500"
-                    >
-                        Forgot password?
-                    </Link>
-                    </div>
-                    <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    />
-                </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4">
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing in...' : 'Sign in'}
-                </Button>
-                <p className="text-center text-sm text-gray-600">
-                    Don&apos;t have an account?{' '}
-                    <Link
-                    href="/sign-up"
-                    className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                    Sign up
-                    </Link>
-                </p>
-                </CardFooter>
-            </form>
-            </Card>
-        </div>
-        </div>
-    )
+            <div className="space-y-2">
+              <Label htmlFor="signin-password">Password</Label>
+              <Input
+                id="signin-password"
+                type="password"
+                value={signInData.password}
+                onChange={(e) =>
+                  setSignInData({ ...signInData, password: e.target.value })
+                }
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <p className="text-sm text-muted-foreground">
+            Dont have an account?{' '}
+            <Link href="/auth/signup" className="text-primary hover:underline">
+              Sign Up
+            </Link>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            By signing in, you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  )
 }

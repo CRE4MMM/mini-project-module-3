@@ -49,7 +49,7 @@ export async function registerCustomer(
     userData: RegisterCustomerData
 ): Promise<AuthResponse> {
     const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
         {
         method: 'POST',
         headers: {
@@ -79,13 +79,13 @@ export async function registerOrganizer(
     userData: RegisterOrganizerData
 ): Promise<AuthResponse> {
     const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register-organizer`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`,
         {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({...userData, role: 'organizer'}),
         }
     )
 

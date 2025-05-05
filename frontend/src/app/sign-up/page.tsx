@@ -2,9 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { AlertCircle, Check } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,348 +14,197 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Link from 'next/link'
 
-export default function SignupPage() {
-  const router = useRouter()
+interface SignUpData {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  role: 'CUSTOMER' | 'ORGANIZER'
+  referredBy?: string
+}
+
+interface AlertMessage {
+  type: 'success' | 'error'
+  title: string
+  message: string
+}
+
+export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [userType, setUserType] = useState('customer')
-  const [formData, setFormData] = useState({
+  const [alert, setAlert] = useState<AlertMessage | null>(null)
+  const router = useRouter()
+
+  const [signUpData, setSignUpData] = useState<SignUpData>({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    referralCode: '',
+    role: 'CUSTOMER',
+    referredBy: '',
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    setError('')
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError('')
-    setSuccess('')
-
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password
-    ) {
-      setError('All fields are required')
-      setIsLoading(false)
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      setIsLoading(false)
-      return
-    }
+    setAlert(null)
 
     try {
-      const endpoint =
-        userType === 'customer'
-          ? `${process.env.NEXT_PUBLIC_API_URL}/auth/register`
-          : `${process.env.NEXT_PUBLIC_API_URL}/auth/register-organizer`
-
-      const response = await fetch(endpoint, {
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL ||
+        'https://mini-project-module-3.vercel.app'
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          referredBy: formData.referralCode || null,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signUpData),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to sign up')
+        throw new Error(data.message || 'Sign up failed')
       }
 
-      setSuccess(
-        userType === 'customer'
-          ? 'Registration successful! Please check your email to verify your account.'
-          : 'Event organizer account created successfully!'
-      )
+      setAlert({
+        type: 'success',
+        title: 'Success',
+        message: 'Account created successfully!',
+      })
 
-      if (userType === 'organizer') {
-        setTimeout(() => {
-          router.push('/signin')
-        }, 2000)
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'An error occurred during registration'
-      )
+      setSignUpData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: 'CUSTOMER',
+        referredBy: '',
+      })
+
+      setTimeout(() => router.push(`/auth/signin`), 1000)
+    } catch (error: any) {
+      setAlert({
+        type: 'error',
+        title: 'Error',
+        message: error.message || 'Failed to create account',
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Create your account</h1>
-          <p className="mt-2 text-gray-600">
-            Sign up to start booking events or create your own
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+          <CardDescription>Create a new account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {alert && (
+            <Alert
+              variant={alert.type === 'error' ? 'destructive' : 'default'}
+              className="mb-4"
+            >
+              <AlertTitle>{alert.title}</AlertTitle>
+              <AlertDescription>{alert.message}</AlertDescription>
+            </Alert>
+          )}
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="signup-firstName">First Name</Label>
+                <Input
+                  id="signup-firstName"
+                  value={signUpData.firstName}
+                  onChange={(e) =>
+                    setSignUpData({ ...signUpData, firstName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-lastName">Last Name</Label>
+                <Input
+                  id="signup-lastName"
+                  value={signUpData.lastName}
+                  onChange={(e) =>
+                    setSignUpData({ ...signUpData, lastName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="signup-email">Email</Label>
+              <Input
+                id="signup-email"
+                type="email"
+                value={signUpData.email}
+                onChange={(e) =>
+                  setSignUpData({ ...signUpData, email: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="signup-password">Password</Label>
+              <Input
+                id="signup-password"
+                type="password"
+                value={signUpData.password}
+                onChange={(e) =>
+                  setSignUpData({ ...signUpData, password: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="signup-role">Role</Label>
+              <select
+                id="signup-role"
+                value={signUpData.role}
+                onChange={(e) =>
+                  setSignUpData({
+                    ...signUpData,
+                    role: e.target.value as 'CUSTOMER' | 'ORGANIZER',
+                  })
+                }
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="CUSTOMER">Customer</option>
+                <option value="ORGANIZER">Organizer</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="signup-referredBy">
+                Referral Code
+              </Label>
+              <Input
+                id="signup-referredBy"
+                value={signUpData.referredBy}
+                onChange={(e) =>
+                  setSignUpData({ ...signUpData, referredBy: e.target.value })
+                }
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Sign Up'}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <p className="text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link href="/auth/signin" className="text-primary hover:underline">
+              Sign In
+            </Link>
           </p>
-        </div>
-
-        <Tabs defaultValue="customer" onValueChange={setUserType}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="customer">Customer</TabsTrigger>
-            <TabsTrigger value="organizer">Event Organizer</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="customer">
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Registration</CardTitle>
-                <CardDescription>
-                  Sign up as a customer to browse and book events
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  {success && (
-                    <Alert className="bg-green-50 text-green-800 border-green-200">
-                      <Check className="h-4 w-4" />
-                      <AlertTitle>Success</AlertTitle>
-                      <AlertDescription>{success}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        placeholder="John"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="referralCode">
-                      Referral Code (Optional)
-                    </Label>
-                    <Input
-                      id="referralCode"
-                      name="referralCode"
-                      placeholder="Enter referral code if you have one"
-                      value={formData.referralCode}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing up...' : 'Sign up'}
-                  </Button>
-                  <p className="text-center text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <Link
-                      href="/sign-in"
-                      className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      Sign in
-                    </Link>
-                  </p>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="organizer">
-            <Card>
-              <CardHeader>
-                <CardTitle>Organizer Registration</CardTitle>
-                <CardDescription>
-                  Sign up as an event organizer to create and manage events
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  {success && (
-                    <Alert className="bg-green-50 text-green-800 border-green-200">
-                      <Check className="h-4 w-4" />
-                      <AlertTitle>Success</AlertTitle>
-                      <AlertDescription>{success}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        placeholder="John"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing up...' : 'Sign up'}
-                  </Button>
-                  <p className="text-center text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <Link
-                      href="/signin"
-                      className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      Sign in
-                    </Link>
-                  </p>
-                </CardFooter>
-              </form>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+          <p className="text-sm text-muted-foreground">
+            By signing up, you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

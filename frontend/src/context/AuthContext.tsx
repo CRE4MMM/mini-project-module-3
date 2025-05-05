@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeAuthData()
     setToken(null)
     setUser(null)
-    router.push('/signin')
+    router.push('/sign-in')
   }
 
   return (
