@@ -1,12 +1,11 @@
 {
   "name": "mini_project",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon",
+    "dev": "nodemon src/index.ts",
     "postinstall": "prisma generate"
   },
   "author": "",

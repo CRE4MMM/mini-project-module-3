@@ -1,5 +1,3 @@
-const { nanoid } = require('nanoid/non-secure');
-
-export const generateReferral = () => {
-  return `REF-${nanoid(8)}`;
-};
+export const generateReferral = (): string => {
+    return Math.random().toString(36).substring(2, 10)
+}
